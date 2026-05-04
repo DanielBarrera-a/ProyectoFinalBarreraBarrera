@@ -13,7 +13,7 @@
 | **Curso** | Programación Orientada a Objetos — S06: 2026-01, Grupo 03 |
 | **Proyecto** | ProyectoFinalBarreraBarrera — The DOPO Hardest Game |
 | **Repositorio** | github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera |
-| **Tiempo invertido** | Cada integrante: ~3 horas | Total equipo: ~6 horas |
+| **Tiempo invertido** | Cada integrante: ~8 horas | Total equipo: ~16 horas |
 | **Fecha** | Mayo 2026 |
 
 ---
