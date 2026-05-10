@@ -3,7 +3,7 @@ package presentation;
 import javax.swing.SwingUtilities;
 
 public class TheDOPOHardestGameGUI {
-    public static void main(String[] args) {
+    static void main() {
         SwingUtilities.invokeLater(() -> {
             GameWindow window = new GameWindow();
             window.setVisible(true);
