@@ -41,7 +41,7 @@ public class MainMenuPanel extends JPanel {
     }
 
     private void startGame(GameMode mode) {
-        String[] options = {"Rojo (Blinky)", "Azul (Inky) \uD83D\uDEA7", "Verde (Clyde) \uD83D\uDEA7"};
+        String[] options = {"Rojo (Blinky)", "Azul (Inky) ", "Verde (Clyde)"};
         int skinChoice = JOptionPane.showOptionDialog(this, "Selecciona tu cuadrado", "Selección de Personaje",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
