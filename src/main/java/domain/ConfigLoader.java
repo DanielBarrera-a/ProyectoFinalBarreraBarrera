@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class ConfigLoader {
     public static TheDOPOHardestGame loadConfig(String filepath, GameMode mode, Skin skin) throws GameException {
         try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
