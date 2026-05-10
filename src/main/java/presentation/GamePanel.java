@@ -22,10 +22,18 @@ public class GamePanel extends JPanel implements ActionListener {
             public void keyPressed(KeyEvent e) {
                 int dx = 0, dy = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP: dy = -1; break;
-                    case KeyEvent.VK_DOWN: dy = 1; break;
-                    case KeyEvent.VK_LEFT: dx = -1; break;
-                    case KeyEvent.VK_RIGHT: dx = 1; break;
+                    case KeyEvent.VK_UP:
+                        dy = -1;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        dy = 1;
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        dx = -1;
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        dx = 1;
+                        break;
                 }
                 if (dx != 0 || dy != 0) {
                     game.movePlayer(dy, dx);
@@ -50,11 +58,11 @@ public class GamePanel extends JPanel implements ActionListener {
     private void checkGameState() {
         if (game.isVictory()) {
             timer.stop();
-            JOptionPane.showMessageDialog(this, "¡Victoria! Has completado el nivel.");
-            window.showMainMenu();
+            JOptionPane.showMessageDialog(this, "¡Victoria! Has completado el nivel " + window.getCurrentLevel() + ".");
+            window.levelCompleted();
         } else if (game.isGameOver()) {
             timer.stop();
-            JOptionPane.showMessageDialog(this, "Game Over. Se acabó el tiempo.");
+            JOptionPane.showMessageDialog(this, "Game Over. Se acabó el tiempo o moriste.");
             window.showMainMenu();
         }
     }
@@ -62,7 +70,7 @@ public class GamePanel extends JPanel implements ActionListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         int offsetX = (getWidth() - game.getCols() * CELL_SIZE) / 2;
         int offsetY = (getHeight() - game.getRows() * CELL_SIZE) / 2;
 
@@ -85,15 +93,15 @@ public class GamePanel extends JPanel implements ActionListener {
         g.setColor(Color.YELLOW);
         for (Coin coin : game.getCoins()) {
             g.fillOval(offsetX + coin.getPosition().getCol() * CELL_SIZE + 10,
-                       offsetY + coin.getPosition().getRow() * CELL_SIZE + 10,
-                       20, 20);
+                    offsetY + coin.getPosition().getRow() * CELL_SIZE + 10,
+                    20, 20);
         }
 
         g.setColor(Color.BLUE);
         for (Enemy enemy : game.getEnemies()) {
             g.fillOval(offsetX + enemy.getPosition().getCol() * CELL_SIZE + 5,
-                       offsetY + enemy.getPosition().getRow() * CELL_SIZE + 5,
-                       30, 30);
+                    offsetY + enemy.getPosition().getRow() * CELL_SIZE + 5,
+                    30, 30);
         }
 
         if (game.getPlayer().getSkin() == Skin.RED) {
@@ -102,8 +110,8 @@ public class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.BLACK);
         }
         g.fillRect(offsetX + game.getPlayer().getPosition().getCol() * CELL_SIZE + 5,
-                   offsetY + game.getPlayer().getPosition().getRow() * CELL_SIZE + 5,
-                   30, 30);
+                offsetY + game.getPlayer().getPosition().getRow() * CELL_SIZE + 5,
+                30, 30);
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 16));

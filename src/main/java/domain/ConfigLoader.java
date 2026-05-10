@@ -24,8 +24,8 @@ public class ConfigLoader {
                 String[] parts = line.split(" ");
                 switch (parts[0]) {
                     case "DIMENSIONS":
-                        rows = Integer.parseInt(parts[1]);
-                        cols = Integer.parseInt(parts[2]);
+                        rows = Integer.parseInt(parts[1]); // y (arriba a abajo)
+                        cols = Integer.parseInt(parts[2]); // x (izquierda a derecha)
                         board = new CellType[rows][cols];
                         for (int i = 0; i < rows; i++) {
                             for (int j = 0; j < cols; j++) {
@@ -37,35 +37,36 @@ public class ConfigLoader {
                         time = Integer.parseInt(parts[1]);
                         break;
                     case "START":
-                        int sr = Integer.parseInt(parts[1]);
-                        int sc = Integer.parseInt(parts[2]);
+                        int sr = Integer.parseInt(parts[1]); // y
+                        int sc = Integer.parseInt(parts[2]); // x
                         startPos = new Position(sr, sc);
                         if (board != null) board[sr][sc] = CellType.SAFE_START;
                         break;
                     case "MID":
-                        int mr = Integer.parseInt(parts[1]);
-                        int mc = Integer.parseInt(parts[2]);
+                        int mr = Integer.parseInt(parts[1]); // y
+                        int mc = Integer.parseInt(parts[2]); // x
                         if (board != null) board[mr][mc] = CellType.SAFE_MID;
                         break;
                     case "END":
-                        int er = Integer.parseInt(parts[1]);
-                        int ec = Integer.parseInt(parts[2]);
+                        int er = Integer.parseInt(parts[1]); // y
+                        int ec = Integer.parseInt(parts[2]); // x
                         if (board != null) board[er][ec] = CellType.SAFE_END;
                         break;
                     case "WALL":
-                        int wr = Integer.parseInt(parts[1]);
-                        int wc = Integer.parseInt(parts[2]);
+                        int wr = Integer.parseInt(parts[1]); // y
+                        int wc = Integer.parseInt(parts[2]); // x
                         if (board != null) board[wr][wc] = CellType.WALL;
                         break;
                     case "COIN":
-                        int cr = Integer.parseInt(parts[2]);
-                        int cc = Integer.parseInt(parts[3]);
+                        int cr = Integer.parseInt(parts[2]); // y
+                        int cc = Integer.parseInt(parts[3]); // x
                         coins.add(new Coin(new Position(cr, cc), parts[1].equals("YELLOW")));
                         break;
                     case "ENEMY":
-                        if (parts[1].equals("BASIC_BLUE")) {
-                            int enr = Integer.parseInt(parts[2]);
-                            int enc = Integer.parseInt(parts[3]);
+                        // Permite cargar enemigos BASIC_RED (como BasicBlueEnemy internamente)
+                        if (parts[1].equals("BASIC_BLUE") || parts[1].equals("BASIC_RED")) {
+                            int enr = Integer.parseInt(parts[2]); // y
+                            int enc = Integer.parseInt(parts[3]); // x
                             boolean isHorizontal = parts[4].equals("HORIZONTAL");
                             enemies.add(new BasicBlueEnemy(new Position(enr, enc), isHorizontal));
                         }

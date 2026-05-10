@@ -10,9 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
 
-
     // HELPER
-
 
     private CellType[][] createEmptyBoard() {
         CellType[][] board = new CellType[5][5];
@@ -28,13 +26,10 @@ public class GameTest {
                 new Position(startRow, startCol),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                60, GameMode.PLAYER, Skin.RED
-        );
+                60, GameMode.PLAYER, Skin.RED);
     }
 
-
     // 1. MOVIMIENTO DEL JUGADOR
-
 
     @Test
     public void testPlayerMovementValid() {
@@ -94,9 +89,7 @@ public class GameTest {
         assertEquals(3, game.getPlayer().getPosition().getCol()); // se quedó en la celda END
     }
 
-
     // 2. TIEMPO Y GAME OVER
-
 
     @Test
     public void testTimeDecreases() {
@@ -128,7 +121,6 @@ public class GameTest {
         assertTrue(game.getTimeRemaining() <= 0);
         assertTrue(game.isGameOver());
     }
-
 
     // 3. MONEDAS
 
@@ -170,9 +162,7 @@ public class GameTest {
         assertFalse(game.isVictory());
     }
 
-
     // 4. COLISIONES CON ENEMIGOS
-
 
     @Test
     public void testEnemyCollisionResetsPlayer() {
@@ -214,7 +204,6 @@ public class GameTest {
 
     // 5. ZONA SEGURA INTERMEDIA (RESPAWN)
 
-
     @Test
     public void testSafeMidUpdatesRespawnPoint() {
         CellType[][] board = createEmptyBoard();
@@ -234,13 +223,12 @@ public class GameTest {
         enemies.add(new BasicBlueEnemy(new Position(2, 1), true)); // enemigo a la izquierda
         TheDOPOHardestGame game = new TheDOPOHardestGame(board, new Position(2, 2),
                 enemies, new ArrayList<>(), 60, GameMode.PLAYER, Skin.RED);
-        game.movePlayer(0, 1);  // llega a SAFE_MID → nuevo respawn en (2,3)
+        game.movePlayer(0, 1); // llega a SAFE_MID → nuevo respawn en (2,3)
         game.movePlayer(0, -2); // se mueve hacia el enemigo → muerte
         // debe regresar a (2,3), no a (2,2)
         assertEquals(2, game.getPlayer().getPosition().getRow());
         assertEquals(3, game.getPlayer().getPosition().getCol());
     }
-
 
     // 6. VICTORIA
 
@@ -268,9 +256,7 @@ public class GameTest {
         assertTrue(game.isVictory());
     }
 
-
     // 7. MOVIMIENTO DE ENEMIGOS (BasicBlueEnemy)
-
 
     @Test
     public void testBasicBlueEnemyMovesHorizontally() {
@@ -280,8 +266,8 @@ public class GameTest {
         TheDOPOHardestGame game = new TheDOPOHardestGame(board, new Position(0, 0),
                 enemies, new ArrayList<>(), 60, GameMode.PLAYER, Skin.RED);
         game.moveEnemies();
-        assertEquals(2, game.getEnemies().getFirst().getPosition().getRow());
-        assertEquals(3, game.getEnemies().getFirst().getPosition().getCol());
+        assertEquals(2, game.getEnemies().get(0).getPosition().getRow());
+        assertEquals(3, game.getEnemies().get(0).getPosition().getCol());
     }
 
     @Test
@@ -292,8 +278,8 @@ public class GameTest {
         TheDOPOHardestGame game = new TheDOPOHardestGame(board, new Position(0, 0),
                 enemies, new ArrayList<>(), 60, GameMode.PLAYER, Skin.RED);
         game.moveEnemies();
-        assertEquals(3, game.getEnemies().getFirst().getPosition().getRow());
-        assertEquals(2, game.getEnemies().getFirst().getPosition().getCol());
+        assertEquals(3, game.getEnemies().get(0).getPosition().getRow());
+        assertEquals(2, game.getEnemies().get(0).getPosition().getCol());
     }
 
     @Test
@@ -305,12 +291,10 @@ public class GameTest {
         TheDOPOHardestGame game = new TheDOPOHardestGame(board, new Position(0, 0),
                 enemies, new ArrayList<>(), 60, GameMode.PLAYER, Skin.RED);
         game.moveEnemies();
-        assertEquals(2, game.getEnemies().getFirst().getPosition().getCol());
+        assertEquals(2, game.getEnemies().get(0).getPosition().getCol());
     }
 
-
     // 8. POSICIÓN y EQUALS
-
 
     @Test
     public void testPositionEquals() {
@@ -325,7 +309,6 @@ public class GameTest {
         Position p2 = new Position(3, 5);
         assertNotEquals(p1, p2);
     }
-
 
     // 9. CONFIGLOADER
 
@@ -345,14 +328,11 @@ public class GameTest {
 
     @Test
     public void testConfigLoaderThrowsOnInvalidFile() {
-        assertThrows(GameException.class, () ->
-                ConfigLoader.loadConfig("nonexistent_file.txt", GameMode.PLAYER, Skin.RED)
-        );
+        assertThrows(GameException.class,
+                () -> ConfigLoader.loadConfig("nonexistent_file.txt", GameMode.PLAYER, Skin.RED));
     }
 
-
     // 10. TABLERO (isValidPosition / getCell)
-
 
     @Test
     public void testIsValidPositionInsideBoard() {
