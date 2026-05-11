@@ -12,12 +12,19 @@ public class Player extends Entity {
         this.respawnPosition = new Position(position.getRow(), position.getCol());
     }
 
-    public int getDeaths() { return deaths; }
-    public void addDeath() { deaths++; }
-    public Skin getSkin() { return skin; }
+    public int getDeaths() {
+        return deaths; }
+
+    public void addDeath() {
+        deaths++; }
+
+    public Skin getSkin() {
+        return skin; }
     
-    public Position getRespawnPosition() { return respawnPosition; }
-    public void setRespawnPosition(Position pos) { 
-        this.respawnPosition = new Position(pos.getRow(), pos.getCol()); 
+    public Position getRespawnPosition() {
+        return respawnPosition; }
+
+    public void setRespawnPosition(Position pos) {
+        this.respawnPosition = new Position(pos.getRow(), pos.getCol());
     }
 }

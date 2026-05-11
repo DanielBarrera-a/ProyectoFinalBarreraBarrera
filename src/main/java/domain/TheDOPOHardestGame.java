@@ -83,14 +83,34 @@ public class TheDOPOHardestGame {
         return r >= 0 && r < board.length && c >= 0 && c < board[0].length;
     }
 
-    public CellType getCell(int r, int c) { return board[r][c]; }
-    public int getRows() { return board.length; }
-    public int getCols() { return board[0].length; }
-    public Player getPlayer() { return player; }
-    public List<Enemy> getEnemies() { return enemies; }
-    public List<Coin> getCoins() { return coins; }
-    public int getTimeRemaining() { return timeRemaining; }
-    public boolean isGameOver() { return isGameOver; }
-    public boolean isVictory() { return isVictory; }
-    public GameMode getMode() { return mode; }
+    public CellType getCell(int r, int c) {
+        return board[r][c]; }
+
+    public int getRows() {
+        return board.length; }
+
+    public int getCols() {
+        return board[0].length; }
+
+    public Player getPlayer() {
+        return player; }
+
+    public List<Enemy> getEnemies() {
+        return enemies; }
+
+    public List<Coin> getCoins() {
+        return coins; }
+
+    public int getTimeRemaining() {
+        return timeRemaining; }
+
+    public boolean isGameOver() {
+        return isGameOver; }
+
+    public boolean isVictory() {
+        return isVictory; }
+
+    public GameMode getMode() {
+        return mode; }
+
 }
