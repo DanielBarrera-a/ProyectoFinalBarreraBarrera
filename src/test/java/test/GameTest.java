@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameTest {
 
     // HELPER
+    //Corregir test
 
     private CellType[][] createEmptyBoard() {
         CellType[][] board = new CellType[5][5];
