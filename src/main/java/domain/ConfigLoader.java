@@ -75,12 +75,16 @@ public class ConfigLoader {
             }
 
             if (board == null || startPos == null) {
-                throw new GameException("Configuración inválida o incompleta (faltan dimensiones o zona inicial).");
+                throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);
             }
 
             return new TheDOPOHardestGame(board, startPos, enemies, coins, time, mode, skin);
-        } catch (IOException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            throw new GameException("Error al cargar nivel: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            throw new GameException(GameException.ERROR_FORMATO_NUMERO);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new GameException(GameException.ERROR_FUERA_DE_LIMITES);
+        } catch (Exception e) {
+            throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);
         }
     }
 }
