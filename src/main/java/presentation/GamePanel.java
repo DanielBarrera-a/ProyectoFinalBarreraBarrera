@@ -40,6 +40,27 @@ public class GamePanel extends JPanel implements ActionListener {
                     repaint();
                     checkGameState();
                 }
+
+                int dx2 = 0, dy2 = 0;
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_W:
+                        dy2 = -1;
+                        break;
+                    case KeyEvent.VK_S:
+                        dy2 = 1;
+                        break;
+                    case KeyEvent.VK_A:
+                        dx2 = -1;
+                        break;
+                    case KeyEvent.VK_D:
+                        dx2 = 1;
+                        break;
+                }
+                if (dx2 != 0 || dy2 != 0) {
+                    game.movePlayer2(dy2, dx2);
+                    repaint();
+                    checkGameState();
+                }
             }
         });
 
@@ -106,6 +127,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
         if (game.getPlayer().getSkin() == Skin.RED) {
             g.setColor(Color.RED);
+        } else if (game.getPlayer().getSkin() == Skin.BLUE) {
+            g.setColor(Color.BLUE);
+        } else if (game.getPlayer().getSkin() == Skin.GREEN) {
+            g.setColor(Color.GREEN);
         } else {
             g.setColor(Color.BLACK);
         }
@@ -113,10 +138,32 @@ public class GamePanel extends JPanel implements ActionListener {
                 offsetY + game.getPlayer().getPosition().getRow() * CELL_SIZE + 5,
                 30, 30);
 
+        if (game.getPlayer2() != null) {
+            if (game.getPlayer2().getSkin() == Skin.RED) {
+                g.setColor(Color.RED);
+            } else if (game.getPlayer2().getSkin() == Skin.BLUE) {
+                g.setColor(Color.BLUE);
+            } else if (game.getPlayer2().getSkin() == Skin.GREEN) {
+                g.setColor(Color.GREEN);
+            } else {
+                g.setColor(Color.BLACK);
+            }
+            g.fillRect(offsetX + game.getPlayer2().getPosition().getCol() * CELL_SIZE + 5,
+                    offsetY + game.getPlayer2().getPosition().getRow() * CELL_SIZE + 5,
+                    30, 30);
+        }
+
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 16));
         g.drawString("Tiempo: " + game.getTimeRemaining(), 20, 30);
-        g.drawString("Muertes: " + game.getPlayer().getDeaths(), 150, 30);
+        
+        if (game.getPlayer2() != null) {
+            g.drawString("P1 Muertes: " + game.getPlayer().getDeaths(), 150, 30);
+            g.drawString("P2 Muertes: " + game.getPlayer2().getDeaths(), 150, 50);
+        } else {
+            g.drawString("Muertes: " + game.getPlayer().getDeaths(), 150, 30);
+        }
+        
         g.drawString("Monedas: " + game.getCoins().size(), 280, 30);
     }
 }

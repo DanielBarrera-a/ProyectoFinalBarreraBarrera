@@ -22,9 +22,9 @@ public class MainMenuPanel extends JPanel {
         btnPlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnPlayer.addActionListener(e -> startGame(GameMode.PLAYER));
 
-        JButton btnPvp = new JButton("Modo PvsP (En desarrollo)");
+        JButton btnPvp = new JButton("Modo PvsP");
         btnPvp.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnPvp.addActionListener(e -> JOptionPane.showMessageDialog(this, "Esta función está en desarrollo"));
+        btnPvp.addActionListener(e -> startGame(GameMode.PVP));
 
         JButton btnPvm = new JButton("Modo PvsM (En desarrollo)");
         btnPvm.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -45,10 +45,14 @@ public class MainMenuPanel extends JPanel {
         int skinChoice = JOptionPane.showOptionDialog(this, "Selecciona tu cuadrado", "Selección de Personaje",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
-        if (skinChoice == 0) {
-            window.startGame(mode, Skin.RED);
-        } else if (skinChoice == 1 || skinChoice == 2) {
-            JOptionPane.showMessageDialog(this, "Esta función está en desarrollo ");
+        Skin skin;
+        if (skinChoice == 1) {
+            skin = Skin.BLUE;
+        } else if (skinChoice == 2) {
+            skin = Skin.GREEN;
+        } else {
+            skin = Skin.RED; // Por defecto
         }
+        window.startGame(mode, skin);
     }
 }
