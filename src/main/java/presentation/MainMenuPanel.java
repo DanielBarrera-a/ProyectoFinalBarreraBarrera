@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class MainMenuPanel extends JPanel {
     private GameWindow window;
-    
+
     public MainMenuPanel(GameWindow window) {
         this.window = window;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -30,6 +30,15 @@ public class MainMenuPanel extends JPanel {
         btnPvm.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnPvm.addActionListener(e -> JOptionPane.showMessageDialog(this, "Esta función está en desarrollo"));
 
+        // ── Persistencia ──────────────────────────────────────────────────
+        JButton btnLoad = new JButton("Cargar partida guardada");
+        btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnLoad.addActionListener(e -> window.loadSavedGame());
+        if (!domain.SaveManager.hasSave()) {
+            btnLoad.setEnabled(false);
+            btnLoad.setToolTipText("No hay ninguna partida guardada.");
+        }
+
         add(Box.createVerticalStrut(100));
         add(title);
         add(Box.createVerticalStrut(50));
@@ -38,6 +47,8 @@ public class MainMenuPanel extends JPanel {
         add(btnPvp);
         add(Box.createVerticalStrut(20));
         add(btnPvm);
+        add(Box.createVerticalStrut(20));
+        add(btnLoad);
     }
 
     private void startGame(GameMode mode) {
@@ -51,7 +62,7 @@ public class MainMenuPanel extends JPanel {
         } else if (skinChoice == 2) {
             skin = Skin.GREEN;
         } else {
-            skin = Skin.RED; // Por defecto
+            skin = Skin.RED;
         }
         window.startGame(mode, skin);
     }

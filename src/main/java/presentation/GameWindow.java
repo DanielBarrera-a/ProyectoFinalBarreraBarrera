@@ -1,5 +1,7 @@
 package presentation;
 
+import domain.Gamesave;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,6 +11,8 @@ public class GameWindow extends JFrame {
     private int currentLevel = 1;
     private domain.GameMode currentMode;
     private domain.Skin currentSkin;
+
+    private domain.TheDOPOHardestGame currentGame;
 
     public GameWindow() {
         setTitle("The DOPO Hardest Game");
@@ -29,15 +33,15 @@ public class GameWindow extends JFrame {
     public void startGame(domain.GameMode mode, domain.Skin skin) {
         this.currentMode = mode;
         this.currentSkin = skin;
-        this.currentLevel = 1; // Start at level 1
+        this.currentLevel = 1;
         loadLevel();
     }
 
     private void loadLevel() {
         try {
             String levelFile = "level" + currentLevel + ".txt";
-            domain.TheDOPOHardestGame game = domain.ConfigLoader.loadConfig(levelFile, currentMode, currentSkin);
-            GamePanel gamePanel = new GamePanel(this, game);
+            currentGame = domain.ConfigLoader.loadConfig(levelFile, currentMode, currentSkin);
+            GamePanel gamePanel = new GamePanel(this, currentGame);
             mainPanel.add(gamePanel, "Game");
             cardLayout.show(mainPanel, "Game");
             gamePanel.requestFocusInWindow();
@@ -59,5 +63,33 @@ public class GameWindow extends JFrame {
 
     public void showMainMenu() {
         cardLayout.show(mainPanel, "MainMenu");
+    }
+
+
+
+    public void saveGame() {
+        try {
+            Gamesave save = new Gamesave(currentGame, currentLevel, currentMode, currentSkin);
+            domain.SaveManager.saveGame(save);
+            JOptionPane.showMessageDialog(this, "¡Partida guardada correctamente!", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+        } catch (domain.GameException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error al guardar", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void loadSavedGame() {
+        try {
+            Gamesave save = domain.SaveManager.loadGame();
+            this.currentLevel = save.currentLevel();
+            this.currentMode  = save.mode();
+            this.currentSkin  = save.skin();
+            this.currentGame  = save.game();
+            GamePanel gamePanel = new GamePanel(this, currentGame);
+            mainPanel.add(gamePanel, "Game");
+            cardLayout.show(mainPanel, "Game");
+            gamePanel.requestFocusInWindow();
+        } catch (domain.GameException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error al cargar", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

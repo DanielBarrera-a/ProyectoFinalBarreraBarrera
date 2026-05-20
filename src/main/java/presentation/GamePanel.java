@@ -20,41 +20,55 @@ public class GamePanel extends JPanel implements ActionListener {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                // ── Persistencia ──────────────────────────────────────────
+                if (e.getKeyCode() == KeyEvent.VK_G) {
+                    timer.stop();
+                    window.saveGame();
+                    timer.start();
+                    return;
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    timer.stop();
+                    int choice = JOptionPane.showOptionDialog(
+                            GamePanel.this,
+                            "Juego pausado. ¿Qué deseas hacer?",
+                            "Pausa",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            new String[]{"Continuar", "Guardar y salir", "Salir sin guardar"},
+                            "Continuar"
+                    );
+                    if (choice == 1) {
+                        window.saveGame();
+                        window.showMainMenu();
+                    } else if (choice == 2) {
+                        window.showMainMenu();
+                    } else {
+                        timer.start();
+                    }
+                    return;
+                }
+                // ── Movimiento Player 1 (flechas) ─────────────────────────
                 int dx = 0, dy = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:
-                        dy = -1;
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        dy = 1;
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        dx = -1;
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        dx = 1;
-                        break;
+                    case KeyEvent.VK_UP:    dy = -1; break;
+                    case KeyEvent.VK_DOWN:  dy =  1; break;
+                    case KeyEvent.VK_LEFT:  dx = -1; break;
+                    case KeyEvent.VK_RIGHT: dx =  1; break;
                 }
                 if (dx != 0 || dy != 0) {
                     game.movePlayer(dy, dx);
                     repaint();
                     checkGameState();
                 }
-
+                // ── Movimiento Player 2 (WASD) ────────────────────────────
                 int dx2 = 0, dy2 = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_W:
-                        dy2 = -1;
-                        break;
-                    case KeyEvent.VK_S:
-                        dy2 = 1;
-                        break;
-                    case KeyEvent.VK_A:
-                        dx2 = -1;
-                        break;
-                    case KeyEvent.VK_D:
-                        dx2 = 1;
-                        break;
+                    case KeyEvent.VK_W: dy2 = -1; break;
+                    case KeyEvent.VK_S: dy2 =  1; break;
+                    case KeyEvent.VK_A: dx2 = -1; break;
+                    case KeyEvent.VK_D: dx2 =  1; break;
                 }
                 if (dx2 != 0 || dy2 != 0) {
                     game.movePlayer2(dy2, dx2);
@@ -156,14 +170,18 @@ public class GamePanel extends JPanel implements ActionListener {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 16));
         g.drawString("Tiempo: " + game.getTimeRemaining(), 20, 30);
-        
+
         if (game.getPlayer2() != null) {
             g.drawString("P1 Muertes: " + game.getPlayer().getDeaths(), 150, 30);
             g.drawString("P2 Muertes: " + game.getPlayer2().getDeaths(), 150, 50);
         } else {
             g.drawString("Muertes: " + game.getPlayer().getDeaths(), 150, 30);
         }
-        
+
         g.drawString("Monedas: " + game.getCoins().size(), 280, 30);
+        // ── Hint teclas ───────────────────────────────────────────────────
+        g.setFont(new Font("Arial", Font.PLAIN, 11));
+        g.setColor(Color.GRAY);
+        g.drawString("[G] Guardar   [ESC] Pausa", 20, getHeight() - 10);
     }
 }
