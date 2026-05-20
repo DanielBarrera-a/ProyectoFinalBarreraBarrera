@@ -1,8 +1,11 @@
 package domain;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class TheDOPOHardestGame {
+public class TheDOPOHardestGame implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private CellType[][] board;
     private Player player;
     private Player player2;
@@ -14,7 +17,7 @@ public class TheDOPOHardestGame {
     private GameMode mode;
 
     public TheDOPOHardestGame(CellType[][] board, Position startPos, List<Enemy> enemies, List<Coin> coins,
-            int timeLimit, GameMode mode, Skin skin) {
+                              int timeLimit, GameMode mode, Skin skin) {
         this.board = board;
         if (mode == GameMode.PVP) {
             this.player = new Player(startPos, Skin.RED);
@@ -67,7 +70,6 @@ public class TheDOPOHardestGame {
             return;
         }
 
-        // Validar movimientos diagonales también si no chocan con pared
         if (isValidPosition(nextRow, nextCol) && board[nextRow][nextCol] != CellType.WALL) {
             player.getPosition().setRow(nextRow);
             player.getPosition().setCol(nextCol);
@@ -184,5 +186,4 @@ public class TheDOPOHardestGame {
     public GameMode getMode() {
         return mode;
     }
-
 }
