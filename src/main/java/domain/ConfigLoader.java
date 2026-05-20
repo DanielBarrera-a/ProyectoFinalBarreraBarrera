@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/*Hacer refactor*/
 
 public class ConfigLoader {
     public static TheDOPOHardestGame loadConfig(String filepath, GameMode mode, Skin skin) throws GameException {
