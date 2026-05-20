@@ -67,20 +67,24 @@ public class GameWindow extends JFrame {
 
 
 
-    public void saveGame() {
+    public boolean saveGame() {
         try {
             Gamesave save = new Gamesave(currentGame, currentLevel, currentMode, currentSkin);
-            domain.SaveManager.saveGame(save);
-            JOptionPane.showMessageDialog(this, "¡Partida guardada correctamente!", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+            boolean saved = domain.SaveManager.saveGame(save);
+            if (saved) {
+                JOptionPane.showMessageDialog(this, "¡Partida guardada correctamente!", "Guardar", JOptionPane.INFORMATION_MESSAGE);
+            }
+            return saved;
         } catch (domain.GameException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error al guardar", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
     public void loadSavedGame() {
         try {
             Gamesave save = domain.SaveManager.loadGame();
-            assert save != null;
+            if (save == null) return;
             this.currentLevel = save.currentLevel();
             this.currentMode  = save.mode();
             this.currentSkin  = save.skin();

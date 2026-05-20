@@ -36,12 +36,15 @@ public class GamePanel extends JPanel implements ActionListener {
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.PLAIN_MESSAGE,
                             null,
-                            new String[]{"Continuar", "Guardar y salir", "Salir sin guardar"},
-                            "Continuar"
-                    );
+                            new String[] { "Continuar", "Guardar y salir", "Salir sin guardar" },
+                            "Continuar");
                     if (choice == 1) {
-                        window.saveGame();
-                        window.showMainMenu();
+                        boolean saved = window.saveGame();
+                        if (saved) {
+                            window.showMainMenu();
+                        } else {
+                            timer.start();
+                        }
                     } else if (choice == 2) {
                         window.showMainMenu();
                     } else {
@@ -52,10 +55,18 @@ public class GamePanel extends JPanel implements ActionListener {
                 // ── Movimiento Player 1 (flechas) ─────────────────────────
                 int dx = 0, dy = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:    dy = -1; break;
-                    case KeyEvent.VK_DOWN:  dy =  1; break;
-                    case KeyEvent.VK_LEFT:  dx = -1; break;
-                    case KeyEvent.VK_RIGHT: dx =  1; break;
+                    case KeyEvent.VK_UP:
+                        dy = -1;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        dy = 1;
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        dx = -1;
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        dx = 1;
+                        break;
                 }
                 if (dx != 0 || dy != 0) {
                     game.movePlayer(dy, dx);
@@ -65,10 +76,18 @@ public class GamePanel extends JPanel implements ActionListener {
                 // ── Movimiento Player 2 (WASD) ────────────────────────────
                 int dx2 = 0, dy2 = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_W: dy2 = -1; break;
-                    case KeyEvent.VK_S: dy2 =  1; break;
-                    case KeyEvent.VK_A: dx2 = -1; break;
-                    case KeyEvent.VK_D: dx2 =  1; break;
+                    case KeyEvent.VK_W:
+                        dy2 = -1;
+                        break;
+                    case KeyEvent.VK_S:
+                        dy2 = 1;
+                        break;
+                    case KeyEvent.VK_A:
+                        dx2 = -1;
+                        break;
+                    case KeyEvent.VK_D:
+                        dx2 = 1;
+                        break;
                 }
                 if (dx2 != 0 || dy2 != 0) {
                     game.movePlayer2(dy2, dx2);

@@ -6,14 +6,14 @@ import java.io.*;
 
 public class SaveManager {
 
-    public static void saveGame(Gamesave save) throws GameException {
+    public static boolean saveGame(Gamesave save) throws GameException {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Guardar partida");
         chooser.setFileFilter(new FileNameExtensionFilter("Partida guardada (*.dat)", "dat"));
         chooser.setSelectedFile(new File("partida.dat"));
 
         int result = chooser.showSaveDialog(null);
-        if (result != JFileChooser.APPROVE_OPTION) return;
+        if (result != JFileChooser.APPROVE_OPTION) return false;
 
         File file = chooser.getSelectedFile();
         if (!file.getName().endsWith(".dat")) {
@@ -22,7 +22,9 @@ public class SaveManager {
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(save);
+            return true;
         } catch (IOException e) {
+            e.printStackTrace();
             throw new GameException(GameException.ERROR_AL_GUARDAR);
         }
     }
