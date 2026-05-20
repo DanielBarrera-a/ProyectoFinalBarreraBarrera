@@ -6,8 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameWindow extends JFrame {
-    private CardLayout cardLayout;
-    private JPanel mainPanel;
+    private final CardLayout cardLayout;
+    private final JPanel mainPanel;
     private int currentLevel = 1;
     private domain.GameMode currentMode;
     private domain.Skin currentSkin;
@@ -80,6 +80,7 @@ public class GameWindow extends JFrame {
     public void loadSavedGame() {
         try {
             Gamesave save = domain.SaveManager.loadGame();
+            assert save != null;
             this.currentLevel = save.currentLevel();
             this.currentMode  = save.mode();
             this.currentSkin  = save.skin();
