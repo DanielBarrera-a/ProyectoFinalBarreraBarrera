@@ -20,6 +20,8 @@ public class GamePanel extends JPanel implements ActionListener {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                if (game.isVictory() || game.isGameOver())
+                    return; // Ignorar eventos si ya terminó
                 // ── Persistencia ──────────────────────────────────────────
                 if (e.getKeyCode() == KeyEvent.VK_G) {
                     timer.stop();
@@ -69,9 +71,13 @@ public class GamePanel extends JPanel implements ActionListener {
                         break;
                 }
                 if (dx != 0 || dy != 0) {
-                    game.movePlayer(dy, dx);
+                    int steps = (game.getPlayer().getSkin() == Skin.BLUE) ? 2 : 1;
+                    for (int i = 0; i < steps; i++) {
+                        game.movePlayer(dy, dx);
+                        if (checkGameState())
+                            return;
+                    }
                     repaint();
-                    checkGameState();
                 }
                 // ── Movimiento Player 2 (WASD) ────────────────────────────
                 int dx2 = 0, dy2 = 0;
@@ -90,9 +96,13 @@ public class GamePanel extends JPanel implements ActionListener {
                         break;
                 }
                 if (dx2 != 0 || dy2 != 0) {
-                    game.movePlayer2(dy2, dx2);
+                    int steps2 = (game.getPlayer2() != null && game.getPlayer2().getSkin() == Skin.BLUE) ? 2 : 1;
+                    for (int i = 0; i < steps2; i++) {
+                        game.movePlayer2(dy2, dx2);
+                        if (checkGameState())
+                            return;
+                    }
                     repaint();
-                    checkGameState();
                 }
             }
         });
@@ -109,16 +119,19 @@ public class GamePanel extends JPanel implements ActionListener {
         checkGameState();
     }
 
-    private void checkGameState() {
+    private boolean checkGameState() {
         if (game.isVictory()) {
             timer.stop();
             JOptionPane.showMessageDialog(this, "¡Victoria! Has completado el nivel " + window.getCurrentLevel() + ".");
             window.levelCompleted();
+            return true;
         } else if (game.isGameOver()) {
             timer.stop();
             JOptionPane.showMessageDialog(this, "Game Over. Se acabó el tiempo o moriste.");
             window.showMainMenu();
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -158,32 +171,10 @@ public class GamePanel extends JPanel implements ActionListener {
                     30, 30);
         }
 
-        if (game.getPlayer().getSkin() == Skin.RED) {
-            g.setColor(Color.RED);
-        } else if (game.getPlayer().getSkin() == Skin.BLUE) {
-            g.setColor(Color.BLUE);
-        } else if (game.getPlayer().getSkin() == Skin.GREEN) {
-            g.setColor(Color.GREEN);
-        } else {
-            g.setColor(Color.BLACK);
-        }
-        g.fillRect(offsetX + game.getPlayer().getPosition().getCol() * CELL_SIZE + 5,
-                offsetY + game.getPlayer().getPosition().getRow() * CELL_SIZE + 5,
-                30, 30);
+        drawPlayer(g, game.getPlayer(), offsetX, offsetY);
 
         if (game.getPlayer2() != null) {
-            if (game.getPlayer2().getSkin() == Skin.RED) {
-                g.setColor(Color.RED);
-            } else if (game.getPlayer2().getSkin() == Skin.BLUE) {
-                g.setColor(Color.BLUE);
-            } else if (game.getPlayer2().getSkin() == Skin.GREEN) {
-                g.setColor(Color.GREEN);
-            } else {
-                g.setColor(Color.BLACK);
-            }
-            g.fillRect(offsetX + game.getPlayer2().getPosition().getCol() * CELL_SIZE + 5,
-                    offsetY + game.getPlayer2().getPosition().getRow() * CELL_SIZE + 5,
-                    30, 30);
+            drawPlayer(g, game.getPlayer2(), offsetX, offsetY);
         }
 
         g.setColor(Color.BLACK);
@@ -202,5 +193,26 @@ public class GamePanel extends JPanel implements ActionListener {
         g.setFont(new Font("Arial", Font.PLAIN, 11));
         g.setColor(Color.GRAY);
         g.drawString("[G] Guardar   [ESC] Pausa", 20, getHeight() - 10);
+    }
+
+    private void drawPlayer(Graphics g, Player p, int offsetX, int offsetY) {
+        int size = 30;
+        int padding = 5;
+
+        if (p.getSkin() == Skin.RED) {
+            g.setColor(Color.RED);
+        } else if (p.getSkin() == Skin.BLUE) {
+            g.setColor(Color.BLUE);
+            size = 38; // Tamaño mayor
+            padding = 1; // Menos margen para que ocupe casi toda la celda (40x40)
+        } else if (p.getSkin() == Skin.GREEN) {
+            g.setColor(Color.GREEN);
+        } else {
+            g.setColor(Color.BLACK);
+        }
+
+        g.fillRect(offsetX + p.getPosition().getCol() * CELL_SIZE + padding,
+                offsetY + p.getPosition().getRow() * CELL_SIZE + padding,
+                size, size);
     }
 }
