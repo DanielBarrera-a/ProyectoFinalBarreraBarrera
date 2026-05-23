@@ -65,7 +65,8 @@ public class GamePanel extends JPanel implements ActionListener {
                     case KeyEvent.VK_RIGHT: dx =  1; break;
                 }
                 if (dx != 0 || dy != 0) {
-                    int steps = (game.getPlayer().getSkin() == Skin.BLUE) ? 2 : 1;
+                    // Cambios para el verde
+                    int steps = game.getPlayer().getSpeed();
                     for (int i = 0; i < steps; i++) {
                         game.movePlayer(dy, dx);
                         if (checkGameState()) return;
@@ -82,7 +83,8 @@ public class GamePanel extends JPanel implements ActionListener {
                     case KeyEvent.VK_D: dx2 =  1; break;
                 }
                 if (dx2 != 0 || dy2 != 0) {
-                    int steps2 = (game.getPlayer2() != null && game.getPlayer2().getSkin() == Skin.BLUE) ? 2 : 1;
+                    // Cambios para el verde
+                    int steps2 = (game.getPlayer2() != null) ? game.getPlayer2().getSpeed() : 1;
                     for (int i = 0; i < steps2; i++) {
                         game.movePlayer2(dy2, dx2);
                         if (checkGameState()) return;
@@ -189,6 +191,8 @@ public class GamePanel extends JPanel implements ActionListener {
             padding = 1;
         } else if (p.getSkin() == Skin.GREEN) {
             g.setColor(Color.GREEN);
+            // Cambios para el verde
+            if (p.isSlowedDown()) g.setColor(new Color(0, 120, 0));
         } else {
             g.setColor(Color.BLACK);
         }
@@ -198,5 +202,15 @@ public class GamePanel extends JPanel implements ActionListener {
                 offsetY + p.getPosition().getRow() * CELL_SIZE + padding,
                 size, size
         );
+
+        // Cambios para el verde
+        if (p.getSkin() == Skin.GREEN && p.isShielded()) {
+            g.setColor(Color.WHITE);
+            g.drawRect(
+                    offsetX + p.getPosition().getCol() * CELL_SIZE + padding,
+                    offsetY + p.getPosition().getRow() * CELL_SIZE + padding,
+                    size, size
+            );
+        }
     }
 }

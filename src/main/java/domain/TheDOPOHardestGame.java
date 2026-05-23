@@ -117,17 +117,26 @@ public class TheDOPOHardestGame implements Serializable {
         }
         coins.removeAll(collected);
 
-        // Colisión con enemigos
         for (Enemy enemy : enemies) {
             if (enemy.getPosition().equals(player.getPosition())) {
-                player.addDeath();
-                player.getPosition().setRow(player.getRespawnPosition().getRow());
-                player.getPosition().setCol(player.getRespawnPosition().getCol());
+                // Cambios para el verde
+                boolean died = player.applyEnemyHit();
+                if (died) {
+                    player.getPosition().setRow(player.getRespawnPosition().getRow());
+                    player.getPosition().setCol(player.getRespawnPosition().getCol());
+                    // Cambios para el verde
+                    player.resetShield();
+                }
             }
             if (player2 != null && enemy.getPosition().equals(player2.getPosition())) {
-                player2.addDeath();
-                player2.getPosition().setRow(player2.getRespawnPosition().getRow());
-                player2.getPosition().setCol(player2.getRespawnPosition().getCol());
+                // Cambios para el verde
+                boolean died = player2.applyEnemyHit();
+                if (died) {
+                    player2.getPosition().setRow(player2.getRespawnPosition().getRow());
+                    player2.getPosition().setCol(player2.getRespawnPosition().getCol());
+                    // Cambios para el verde
+                    player2.resetShield();
+                }
             }
         }
     }
