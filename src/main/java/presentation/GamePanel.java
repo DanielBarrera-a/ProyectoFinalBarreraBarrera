@@ -5,6 +5,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * Panel principal del juego.
+ * ningun cambio para dibujarla correctamente.
+ */
 public class GamePanel extends JPanel implements ActionListener {
     private GameWindow window;
     private TheDOPOHardestGame game;
@@ -20,15 +24,15 @@ public class GamePanel extends JPanel implements ActionListener {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (game.isVictory() || game.isGameOver())
-                    return; // Ignorar eventos si ya terminó
-                // ── Persistencia ──────────────────────────────────────────
+                if (game.isVictory() || game.isGameOver()) return;
+
                 if (e.getKeyCode() == KeyEvent.VK_G) {
                     timer.stop();
                     window.saveGame();
                     timer.start();
                     return;
                 }
+
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     timer.stop();
                     int choice = JOptionPane.showOptionDialog(
@@ -38,15 +42,12 @@ public class GamePanel extends JPanel implements ActionListener {
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.PLAIN_MESSAGE,
                             null,
-                            new String[] { "Continuar", "Guardar y salir", "Salir sin guardar" },
+                            new String[]{"Continuar", "Guardar y salir", "Salir sin guardar"},
                             "Continuar");
                     if (choice == 1) {
                         boolean saved = window.saveGame();
-                        if (saved) {
-                            window.showMainMenu();
-                        } else {
-                            timer.start();
-                        }
+                        if (saved) window.showMainMenu();
+                        else timer.start();
                     } else if (choice == 2) {
                         window.showMainMenu();
                     } else {
@@ -54,53 +55,37 @@ public class GamePanel extends JPanel implements ActionListener {
                     }
                     return;
                 }
-                // ── Movimiento Player 1 (flechas) ─────────────────────────
+
+                // Movimiento Player 1 (flechas)
                 int dx = 0, dy = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:
-                        dy = -1;
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        dy = 1;
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        dx = -1;
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        dx = 1;
-                        break;
+                    case KeyEvent.VK_UP:    dy = -1; break;
+                    case KeyEvent.VK_DOWN:  dy =  1; break;
+                    case KeyEvent.VK_LEFT:  dx = -1; break;
+                    case KeyEvent.VK_RIGHT: dx =  1; break;
                 }
                 if (dx != 0 || dy != 0) {
                     int steps = (game.getPlayer().getSkin() == Skin.BLUE) ? 2 : 1;
                     for (int i = 0; i < steps; i++) {
                         game.movePlayer(dy, dx);
-                        if (checkGameState())
-                            return;
+                        if (checkGameState()) return;
                     }
                     repaint();
                 }
-                // ── Movimiento Player 2 (WASD) ────────────────────────────
+
+                // Movimiento Player 2 (WASD)
                 int dx2 = 0, dy2 = 0;
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_W:
-                        dy2 = -1;
-                        break;
-                    case KeyEvent.VK_S:
-                        dy2 = 1;
-                        break;
-                    case KeyEvent.VK_A:
-                        dx2 = -1;
-                        break;
-                    case KeyEvent.VK_D:
-                        dx2 = 1;
-                        break;
+                    case KeyEvent.VK_W: dy2 = -1; break;
+                    case KeyEvent.VK_S: dy2 =  1; break;
+                    case KeyEvent.VK_A: dx2 = -1; break;
+                    case KeyEvent.VK_D: dx2 =  1; break;
                 }
                 if (dx2 != 0 || dy2 != 0) {
                     int steps2 = (game.getPlayer2() != null && game.getPlayer2().getSkin() == Skin.BLUE) ? 2 : 1;
                     for (int i = 0; i < steps2; i++) {
                         game.movePlayer2(dy2, dx2);
-                        if (checkGameState())
-                            return;
+                        if (checkGameState()) return;
                     }
                     repaint();
                 }
@@ -127,7 +112,7 @@ public class GamePanel extends JPanel implements ActionListener {
             return true;
         } else if (game.isGameOver()) {
             timer.stop();
-            JOptionPane.showMessageDialog(this, "Game Over. Se acabó el tiempo o moriste.");
+            JOptionPane.showMessageDialog(this, "Game Over. Se acabó el tiempo.");
             window.showMainMenu();
             return true;
         }
@@ -141,6 +126,7 @@ public class GamePanel extends JPanel implements ActionListener {
         int offsetX = (getWidth() - game.getCols() * CELL_SIZE) / 2;
         int offsetY = (getHeight() - game.getRows() * CELL_SIZE) / 2;
 
+        // Dibujar tablero
         for (int r = 0; r < game.getRows(); r++) {
             for (int c = 0; c < game.getCols(); c++) {
                 CellType type = game.getCell(r, c);
@@ -157,26 +143,23 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         }
 
-        g.setColor(Color.YELLOW);
+        // Cada moneda sabe cómo dibujarse a sí misma (OCP)
         for (Coin coin : game.getCoins()) {
-            g.fillOval(offsetX + coin.getPosition().getCol() * CELL_SIZE + 10,
-                    offsetY + coin.getPosition().getRow() * CELL_SIZE + 10,
-                    20, 20);
+            coin.draw(g, offsetX, offsetY, CELL_SIZE);
         }
 
-        g.setColor(Color.BLUE);
+        // Cada enemigo sabe cómo dibujarse a sí mismo (OCP)
         for (Enemy enemy : game.getEnemies()) {
-            g.fillOval(offsetX + enemy.getPosition().getCol() * CELL_SIZE + 5,
-                    offsetY + enemy.getPosition().getRow() * CELL_SIZE + 5,
-                    30, 30);
+            enemy.draw(g, offsetX, offsetY, CELL_SIZE);
         }
 
+        // Dibujar jugadores
         drawPlayer(g, game.getPlayer(), offsetX, offsetY);
-
         if (game.getPlayer2() != null) {
             drawPlayer(g, game.getPlayer2(), offsetX, offsetY);
         }
 
+        // HUD
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 16));
         g.drawString("Tiempo: " + game.getTimeRemaining(), 20, 30);
@@ -189,7 +172,6 @@ public class GamePanel extends JPanel implements ActionListener {
         }
 
         g.drawString("Monedas: " + game.getCoins().size(), 280, 30);
-        // ── Hint teclas ───────────────────────────────────────────────────
         g.setFont(new Font("Arial", Font.PLAIN, 11));
         g.setColor(Color.GRAY);
         g.drawString("[G] Guardar   [ESC] Pausa", 20, getHeight() - 10);
@@ -203,16 +185,18 @@ public class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.RED);
         } else if (p.getSkin() == Skin.BLUE) {
             g.setColor(Color.BLUE);
-            size = 38; // Tamaño mayor
-            padding = 1; // Menos margen para que ocupe casi toda la celda (40x40)
+            size = 38;
+            padding = 1;
         } else if (p.getSkin() == Skin.GREEN) {
             g.setColor(Color.GREEN);
         } else {
             g.setColor(Color.BLACK);
         }
 
-        g.fillRect(offsetX + p.getPosition().getCol() * CELL_SIZE + padding,
+        g.fillRect(
+                offsetX + p.getPosition().getCol() * CELL_SIZE + padding,
                 offsetY + p.getPosition().getRow() * CELL_SIZE + padding,
-                size, size);
+                size, size
+        );
     }
 }

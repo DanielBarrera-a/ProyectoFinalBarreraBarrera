@@ -30,7 +30,8 @@ public class MainMenuPanel extends JPanel {
         btnPvm.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnPvm.addActionListener(e -> JOptionPane.showMessageDialog(this, "Esta función está en desarrollo"));
 
-        // ── Persistencia ──────────────────────────────────────────────────
+        // En esta parte es que se esta agregando la persistencia
+
         JButton btnLoad = new JButton("Cargar partida guardada");
         btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoad.addActionListener(e -> window.loadSavedGame());

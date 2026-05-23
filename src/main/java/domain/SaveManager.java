@@ -51,6 +51,6 @@ public class SaveManager {
 
     public static boolean hasSave() {
 
-        return true; // Con JFileChooser siempre habilitamos el botón
+        return true; // Con JFileChooser siempre habilitamos el boton
     }
 }

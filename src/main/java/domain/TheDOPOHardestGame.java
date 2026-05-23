@@ -1,8 +1,14 @@
 package domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Motor principal del juego la clase mas dura del sistema :D
+ * Trabaja con las clases abstractas, por lo tanto agregar nuevos tipos
+ * no requiere modificar esta clase para lo que vaya a implementar, NO LA TOQUE
+ */
 public class TheDOPOHardestGame implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -19,6 +25,7 @@ public class TheDOPOHardestGame implements Serializable {
     public TheDOPOHardestGame(CellType[][] board, Position startPos, List<Enemy> enemies, List<Coin> coins,
                               int timeLimit, GameMode mode, Skin skin) {
         this.board = board;
+
         if (mode == GameMode.PVP) {
             this.player = new Player(startPos, Skin.RED);
             Position endPos = startPos;
@@ -34,6 +41,7 @@ public class TheDOPOHardestGame implements Serializable {
         } else {
             this.player = new Player(startPos, skin);
         }
+
         this.enemies = enemies;
         this.coins = coins;
         this.timeRemaining = timeLimit;
@@ -43,8 +51,7 @@ public class TheDOPOHardestGame implements Serializable {
     }
 
     public void tickTime() {
-        if (isGameOver || isVictory)
-            return;
+        if (isGameOver || isVictory) return;
         timeRemaining--;
         if (timeRemaining <= 0) {
             isGameOver = true;
@@ -52,8 +59,7 @@ public class TheDOPOHardestGame implements Serializable {
     }
 
     public void moveEnemies() {
-        if (isGameOver || isVictory)
-            return;
+        if (isGameOver || isVictory) return;
         for (Enemy enemy : enemies) {
             enemy.move(this);
         }
@@ -61,12 +67,13 @@ public class TheDOPOHardestGame implements Serializable {
     }
 
     public void movePlayer(int dRow, int dCol) {
-        if (isGameOver || isVictory)
-            return;
+        if (isGameOver || isVictory) return;
         int nextRow = player.getPosition().getRow() + dRow;
         int nextCol = player.getPosition().getCol() + dCol;
 
-        if (player2 != null && nextRow == player2.getPosition().getRow() && nextCol == player2.getPosition().getCol()) {
+        if (player2 != null
+                && nextRow == player2.getPosition().getRow()
+                && nextCol == player2.getPosition().getCol()) {
             return;
         }
 
@@ -79,12 +86,12 @@ public class TheDOPOHardestGame implements Serializable {
     }
 
     public void movePlayer2(int dRow, int dCol) {
-        if (isGameOver || isVictory || player2 == null)
-            return;
+        if (isGameOver || isVictory || player2 == null) return;
         int nextRow = player2.getPosition().getRow() + dRow;
         int nextCol = player2.getPosition().getCol() + dCol;
 
-        if (nextRow == player.getPosition().getRow() && nextCol == player.getPosition().getCol()) {
+        if (nextRow == player.getPosition().getRow()
+                && nextCol == player.getPosition().getCol()) {
             return;
         }
 
@@ -97,11 +104,20 @@ public class TheDOPOHardestGame implements Serializable {
     }
 
     private void checkCollisions() {
-        // Recoger monedas
-        coins.removeIf(coin -> coin.getPosition().equals(player.getPosition())
-                || (player2 != null && coin.getPosition().equals(player2.getPosition())));
+        // Recoger monedas: llamamos onCollected antes de eliminarlas
+        List<Coin> collected = new ArrayList<>();
+        for (Coin coin : coins) {
+            if (coin.getPosition().equals(player.getPosition())) {
+                coin.onCollected(player, this);
+                collected.add(coin);
+            } else if (player2 != null && coin.getPosition().equals(player2.getPosition())) {
+                coin.onCollected(player2, this);
+                collected.add(coin);
+            }
+        }
+        coins.removeAll(collected);
 
-        // Chocar con enemigos
+        // Colisión con enemigos
         for (Enemy enemy : enemies) {
             if (enemy.getPosition().equals(player.getPosition())) {
                 player.addDeath();
@@ -129,8 +145,7 @@ public class TheDOPOHardestGame implements Serializable {
         if (player2 != null) {
             CellType currentCell2 = board[player2.getPosition().getRow()][player2.getPosition().getCol()];
             if (currentCell2 == CellType.SAFE_MID) {
-                player2.setRespawnPosition(
-                        new Position(player2.getPosition().getRow(), player2.getPosition().getCol()));
+                player2.setRespawnPosition(new Position(player2.getPosition().getRow(), player2.getPosition().getCol()));
             } else if (currentCell2 == CellType.SAFE_START) {
                 if (coins.isEmpty()) {
                     isVictory = true;
@@ -148,42 +163,32 @@ public class TheDOPOHardestGame implements Serializable {
     }
 
     public int getRows() {
-        return board.length;
-    }
+        return board.length; }
 
     public int getCols() {
-        return board[0].length;
-    }
+        return board[0].length; }
 
     public Player getPlayer() {
-        return player;
-    }
+        return player; }
 
     public Player getPlayer2() {
-        return player2;
-    }
+        return player2; }
 
     public List<Enemy> getEnemies() {
-        return enemies;
-    }
+        return enemies; }
 
     public List<Coin> getCoins() {
-        return coins;
-    }
+        return coins; }
 
     public int getTimeRemaining() {
-        return timeRemaining;
-    }
+        return timeRemaining; }
 
     public boolean isGameOver() {
-        return isGameOver;
-    }
+        return isGameOver; }
 
     public boolean isVictory() {
-        return isVictory;
-    }
+        return isVictory; }
 
     public GameMode getMode() {
-        return mode;
-    }
+        return mode; }
 }

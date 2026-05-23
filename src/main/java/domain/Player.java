@@ -1,9 +1,15 @@
 package domain;
 
+/**
+ * Esta clse representa al jugador del juego
+ * Hereda de Entity
+ */
 public class Player extends Entity {
-    private Skin skin;
+    private static final long serialVersionUID = 1L;
+
     private int deaths;
     private Position respawnPosition;
+    private Skin skin;
 
     public Player(Position position, Skin skin) {
         super(new Position(position.getRow(), position.getCol()));
@@ -13,18 +19,27 @@ public class Player extends Entity {
     }
 
     public int getDeaths() {
-        return deaths; }
+        return deaths;
+    }
 
     public void addDeath() {
-        deaths++; }
+        deaths++;
+    }
+
+    public void reduceDeath() {
+        if (deaths > 0) deaths--;
+    }
 
     public Skin getSkin() {
-        return skin; }
-    
+        return skin;
+    }
+
     public Position getRespawnPosition() {
-        return respawnPosition; }
+        return respawnPosition;
+    }
 
     public void setRespawnPosition(Position pos) {
         this.respawnPosition = new Position(pos.getRow(), pos.getCol());
     }
 }
+

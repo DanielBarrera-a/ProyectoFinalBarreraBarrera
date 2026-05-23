@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/*Hacer refactor*/
-
+/**
+ * Carga la configuración de un nivel desde un archivo .txt.
+ * SRP: Su única responsabilidad es leer el archivo y construir el juego.
+ * OCP: No instancia enemigos ni monedas directamente. Delega eso a las
+ * fábricas (EnemyFactory, CoinFactory). Para agregar un nuevo tipo de
+ * entidad, no se toca este archivo.
+ */
 public class ConfigLoader {
 
     /**
-     * Objeto de transferencia de datos interno para mantener el estado de la lectura del nivel.
+     * Objeto interno para acumular los datos del nivel mientras se lee el archivo.
      */
     private static class ParseContext {
         int time = 60;
@@ -22,13 +27,13 @@ public class ConfigLoader {
     }
 
     /**
-     * Lee un archivo de nivel y construye una instancia de TheDOPOHardestGame.
+     * Lee un archivo de nivel y construye una instancia de TheDOPOHardestGame
      *
-     * @param filepath Ruta del archivo de texto del nivel.
-     * @param mode     Modo de juego seleccionado (PLAYER, PVP, etc.).
-     * @param skin     Skin o aspecto seleccionado por el jugador.
-     * @return Instancia configurada de TheDOPOHardestGame lista para jugar.
-     * @throws GameException Si el archivo no existe, tiene formato inválido o datos corruptos.
+     * @param filepath Ruta del archivo .txt del nivel
+     * @param mode     Modo de juego (PLAYER, PVP, PVM)
+     * @param skin     Skin seleccionada por el jugador
+     * @return Instancia del juego lista para jugar
+     * @throws GameException Si el archivo tiene errores o formato invalido
      */
     public static TheDOPOHardestGame loadConfig(String filepath, GameMode mode, Skin skin) throws GameException {
         ParseContext context = new ParseContext();
@@ -36,72 +41,67 @@ public class ConfigLoader {
         try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                processConfigurationLine(line.trim(), context);
+                processLine(line.trim(), context);
             }
-
-            if (context.board == null || context.startPos == null) {
-                throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);
-            }
-
-            return new TheDOPOHardestGame(context.board, context.startPos, context.enemies, context.coins, context.time, mode, skin);
+        } catch (IOException e) {
+            throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);
         } catch (NumberFormatException e) {
             throw new GameException(GameException.ERROR_FORMATO_NUMERO);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new GameException(GameException.ERROR_FUERA_DE_LIMITES);
-        } catch (Exception e) {
+        }
+
+        if (context.board == null || context.startPos == null) {
             throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);
         }
+
+        return new TheDOPOHardestGame(
+                context.board, context.startPos,
+                context.enemies, context.coins,
+                context.time, mode, skin
+        );
     }
 
     /**
-     * Procesa una sola línea del archivo de configuración.
-     * 
-     * @param line    Línea leída del archivo.
-     * @param context Contexto de parseo actual donde se guardarán los resultados.
+     * Procesa una línea del archivo de nivel
      */
-    private static void processConfigurationLine(String line, ParseContext context) {
+    private static void processLine(String line, ParseContext context) throws GameException {
         if (line.isEmpty() || line.startsWith("#")) return;
-        
+
         String[] parts = line.split(" ");
         String command = parts[0];
 
         switch (command) {
             case "DIMENSIONS":
-                initializeBoardDimensions(parts, context);
+                initBoard(parts, context);
                 break;
             case "TIME":
                 context.time = Integer.parseInt(parts[1]);
                 break;
             case "START":
-                configurePlayerStartPosition(parts, context);
+                configureStart(parts, context);
                 break;
             case "MID":
-                configureBoardCellType(parts, context, CellType.SAFE_MID);
+                setCell(parts, context, CellType.SAFE_MID);
                 break;
             case "END":
-                configureBoardCellType(parts, context, CellType.SAFE_END);
+                setCell(parts, context, CellType.SAFE_END);
                 break;
             case "WALL":
-                configureBoardCellType(parts, context, CellType.WALL);
+                setCell(parts, context, CellType.WALL);
                 break;
             case "COIN":
-                registerCoinEntity(parts, context);
+                registerCoin(parts, context);
                 break;
             case "ENEMY":
-                registerEnemyEntity(parts, context);
+                registerEnemy(parts, context);
                 break;
         }
     }
 
-    /**
-     * Inicializa las dimensiones del tablero a partir del comando DIMENSIONS.
-     * 
-     * @param parts   Fragmentos de la línea separados por espacio.
-     * @param context Contexto de parseo actual.
-     */
-    private static void initializeBoardDimensions(String[] parts, ParseContext context) {
-        int rows = Integer.parseInt(parts[1]); // y (arriba a abajo)
-        int cols = Integer.parseInt(parts[2]); // x (izquierda a derecha)
+    private static void initBoard(String[] parts, ParseContext context) {
+        int rows = Integer.parseInt(parts[1]);
+        int cols = Integer.parseInt(parts[2]);
         context.board = new CellType[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -110,58 +110,40 @@ public class ConfigLoader {
         }
     }
 
-    /**
-     * Configura la posición inicial del jugador (START).
-     * 
-     * @param parts   Fragmentos de la línea separados por espacio.
-     * @param context Contexto de parseo actual.
-     */
-    private static void configurePlayerStartPosition(String[] parts, ParseContext context) {
-        int sr = Integer.parseInt(parts[1]); // y
-        int sc = Integer.parseInt(parts[2]); // x
-        context.startPos = new Position(sr, sc);
-        if (context.board != null) context.board[sr][sc] = CellType.SAFE_START;
+    private static void configureStart(String[] parts, ParseContext context) {
+        int r = Integer.parseInt(parts[1]);
+        int c = Integer.parseInt(parts[2]);
+        context.startPos = new Position(r, c);
+        if (context.board != null) context.board[r][c] = CellType.SAFE_START;
+    }
+
+    private static void setCell(String[] parts, ParseContext context, CellType type) {
+        int r = Integer.parseInt(parts[1]);
+        int c = Integer.parseInt(parts[2]);
+        if (context.board != null) context.board[r][c] = type;
     }
 
     /**
-     * Configura una zona específica en el tablero (WALL, MID, END).
-     * 
-     * @param parts    Fragmentos de la línea separados por espacio.
-     * @param context  Contexto de parseo actual.
-     * @param cellType Tipo de celda a establecer.
+     * Delega la creación de la moneda a CoinFactory.
+     * Si mañana hay un nuevo coin, se escribe en el .txt, solo se agrega el caso en CoinFactory dentro
+     * del contructor de coin
      */
-    private static void configureBoardCellType(String[] parts, ParseContext context, CellType cellType) {
-        int r = Integer.parseInt(parts[1]); // y
-        int c = Integer.parseInt(parts[2]); // x
-        if (context.board != null) context.board[r][c] = cellType;
+    private static void registerCoin(String[] parts, ParseContext context) throws GameException {
+        String type = parts[1];           // Ej: "YELLOW" o "GREEN_MAGIC"
+        int r = Integer.parseInt(parts[2]);
+        int c = Integer.parseInt(parts[3]);
+        context.coins.add(CoinFactory.create(type, new Position(r, c)));
     }
 
     /**
-     * Crea y añade una moneda (COIN) al contexto.
-     * 
-     * @param parts   Fragmentos de la línea separados por espacio.
-     * @param context Contexto de parseo actual.
+     * Delega la creación del enemigo a EnemyFactory.
+     * Si mañana hay que crear un nuevo enemigo, se escribe en el .txt, solo se agrega el caso en EnemyFactory
      */
-    private static void registerCoinEntity(String[] parts, ParseContext context) {
-        boolean isYellow = parts[1].equals("YELLOW");
-        int r = Integer.parseInt(parts[2]); // y
-        int c = Integer.parseInt(parts[3]); // x
-        context.coins.add(new Coin(new Position(r, c), isYellow));
-    }
-
-    /**
-     * Crea y añade un enemigo (ENEMY) al contexto.
-     * 
-     * @param parts   Fragmentos de la línea separados por espacio.
-     * @param context Contexto de parseo actual.
-     */
-    private static void registerEnemyEntity(String[] parts, ParseContext context) {
-        // Permite cargar enemigos BASIC_RED (como BasicBlueEnemy internamente)
-        if (parts[1].equals("BASIC_BLUE") || parts[1].equals("BASIC_RED")) {
-            int r = Integer.parseInt(parts[2]); // y
-            int c = Integer.parseInt(parts[3]); // x
-            boolean isHorizontal = parts[4].equals("HORIZONTAL");
-            context.enemies.add(new BasicBlueEnemy(new Position(r, c), isHorizontal));
-        }
+    private static void registerEnemy(String[] parts, ParseContext context) throws GameException {
+        String type = parts[1];           // Ej: "BASIC_BLUE" o "BASIC_RED"
+        int r = Integer.parseInt(parts[2]);
+        int c = Integer.parseInt(parts[3]);
+        boolean isHorizontal = parts[4].equals("HORIZONTAL");
+        context.enemies.add(EnemyFactory.create(type, new Position(r, c), isHorizontal));
     }
 }
