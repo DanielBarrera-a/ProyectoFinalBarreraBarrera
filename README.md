@@ -120,7 +120,7 @@ mvn pmd:pmd
 
 ### Resultados obtenidos — PMD 7.0.0
 
-El análisis se ejecutó sobre el paquete `domain` (el paquete `presentation` fue excluido explícitamente). Se encontraron **4 violaciones en 3 archivos**, lo que refleja un código bastante limpio en general.
+El análisis se ejecutó sobre el paquete `domain` . Se encontraron **4 violaciones en 3 archivos**, lo que refleja un código bastante limpio en general.
 
 #### Resumen de violaciones
 
@@ -132,27 +132,7 @@ El análisis se ejecutó sobre el paquete `domain` (el paquete `presentation` fu
 | `SaveManager.java` | `UnnecessaryImport` | Import no usado: `javax.swing.*` | 4 | 3 |
 | `SaveManager.java` | `UnnecessaryImport` | Import no usado: `java.io.*` | 4 | 5 |
 
-#### Análisis de cada violación
 
-**`TheDOPOHardestGame.java` — `CollapsibleIfStatements` (Prioridad 3)**
-
-En las líneas 204 y 212 hay dos `if` anidados que PMD sugiere combinar en uno solo usando `&&`. Por ejemplo, un patrón como:
-
-```
-if (condicionA) {
-    if (condicionB) { ... }
-}
-```
-
-podría reescribirse como `if (condicionA && condicionB) { ... }` para mejorar la legibilidad. Estas dos líneas están dentro de la lógica de colisiones o movimiento de enemigos, zona de mayor complejidad de la clase. La funcionalidad es correcta; es solo una sugerencia de estilo.
-
-**`PatrolEnemy.java` — `UnnecessaryImport` (Prioridad 4)**
-
-El import `java.util.ArrayList` en la línea 6 no se referencia directamente en el cuerpo de la clase. Probablemente quedó de una versión anterior donde se usaba una lista local. Se puede eliminar sin ningún efecto.
-
-**`SaveManager.java` — `UnnecessaryImport` (Prioridad 4)**
-
-Los imports `javax.swing.*` y `java.io.*` aparecen en las líneas 3 y 5 pero no se usan directamente en el código de la clase. Dado que `SaveManager` delega en `JFileChooser` (componente Swing), estos imports pueden ser residuos de refactorizaciones anteriores o estar cubiertos por importaciones más específicas en otro punto.
 
 ### Conclusión del análisis estático
 
@@ -237,9 +217,9 @@ Tras cada bloque de tests nuevos ejecutamos `mvn test jacoco:report` y medimos e
 
 | Paquete        | Instrucciones antes | Instrucciones después | Ramas antes | Ramas después |
 |----------------|:-------------------:|:---------------------:|:-----------:|:-------------:|
-| `domain`       | 36 %                | ~80 %                 | 28 %        | ~75 %         |
+| `domain`       | 36 %                | 80 %                 | 28 %        | 75 %         |
 | `presentation` | 0 %                 | 0 %                   | 0 %         | 0 %           |
-| `test`         | 96 %                | ~98 %                 | 100 %       | ~100 %        |
+| `test`         | 96 %                | 98 %                 | 100 %       | 100 %        |
 | **Total**      | **36 %**            | **~80 %**             | **22 %**    | **~74 %**     |
 
 #### Por qué priorizamos los métodos `draw()` de enemigos y monedas
