@@ -57,7 +57,6 @@ mvn compile
 mvn compile exec:java -Dexec.mainClass="presentation.TheDOPOHardestGameGUI"
 ```
 
-> **Nota:** el juego requiere entorno gráfico. No funciona en servidores sin pantalla (headless).
 
 ### Ejecutar los tests unitarios
 
@@ -103,9 +102,7 @@ Para ver solo las violaciones en consola:
 mvn pmd:check
 ```
 
-> Si PMD no está configurado en el `pom.xml`, agrega el plugin `maven-pmd-plugin` (ver sección 3).
 
----
 
 ## 3 · Reporte de análisis estático — PMD
 
