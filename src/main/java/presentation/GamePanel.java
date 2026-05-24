@@ -150,6 +150,11 @@ public class GamePanel extends JPanel implements ActionListener {
             coin.draw(g, offsetX, offsetY, CELL_SIZE);
         }
 
+        // Cada elemento especial sabe cómo dibujarse a sí mismo (OCP)
+        for (SpecialElement se : game.getSpecialElements()) {
+            if (se.isActive()) se.draw(g, offsetX, offsetY, CELL_SIZE);
+        }
+
         // Cada enemigo sabe cómo dibujarse a sí mismo (OCP)
         for (Enemy enemy : game.getEnemies()) {
             enemy.draw(g, offsetX, offsetY, CELL_SIZE);

@@ -24,6 +24,7 @@ public class ConfigLoader {
         Position startPos = null;
         List<Enemy> enemies = new ArrayList<>();
         List<Coin> coins = new ArrayList<>();
+        List<SpecialElement> specialElements = new ArrayList<>();
     }
 
     /**
@@ -58,6 +59,7 @@ public class ConfigLoader {
         return new TheDOPOHardestGame(
                 context.board, context.startPos,
                 context.enemies, context.coins,
+                context.specialElements,
                 context.time, mode, skin
         );
     }
@@ -89,6 +91,9 @@ public class ConfigLoader {
                 break;
             case "WALL":
                 setCell(parts, context, CellType.WALL);
+                break;
+            case "SPECIAL":
+                registerSpecialElement(parts, context);
                 break;
             case "COIN":
                 registerCoin(parts, context);
@@ -133,6 +138,13 @@ public class ConfigLoader {
         int r = Integer.parseInt(parts[2]);
         int c = Integer.parseInt(parts[3]);
         context.coins.add(CoinFactory.create(type, new Position(r, c)));
+    }
+
+    private static void registerSpecialElement(String[] parts, ParseContext context) throws GameException {
+        String type = parts[1];           // Ej: "BOMB", "LIFE_SOURCE"
+        int r = Integer.parseInt(parts[2]);
+        int c = Integer.parseInt(parts[3]);
+        context.specialElements.add(SpecialElementFactory.create(type, new Position(r, c)));
     }
 
     /**
