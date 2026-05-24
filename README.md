@@ -1,97 +1,111 @@
-#informe a entregar ciclo 2#
-# README — Retrospectiva
-### ProyectoFinal — The DOPO Hardest Game
-**Escuela Colombiana de Ingeniería | POO 2026-01 | Grupo 03**
+# Análisis de Cobertura de Pruebas — The DOPO Hardest Game
+**Escuela Colombiana de Ingeniería Julio Garavito | DOPO 2026-1**  
+**Equipo:** Daniel Barrera & Daniel Barrera
 
 ---
 
-## 1. Información General del Equipo
+## 1. Estado Inicial
 
-| Campo | Detalle |
-|---|---|
-| **Integrantes** | Barrera & Barrera |
-| **Curso** | Programación Orientada a Objetos — S06: 2026-01, Grupo 03 |
-| **Proyecto** | ProyectoFinalBarreraBarrera — The DOPO Hardest Game |
-| **Repositorio** | github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera |
-| **Tiempo invertido** | Cada integrante: ~8 horas | Total equipo: ~16 horas |
-| **Fecha** | Mayo 2026 |
+Al ejecutar JaCoCo por primera vez con los 28 tests existentes, estos fueron los resultados:
 
----
+| Paquete | Cobertura instrucciones | Cobertura ramas | Métodos cubiertos | Clases cubiertas |
+|---|---|---|---|---|
+| `domain` | **36%** (379/575) | **28%** (193/575) | 54 / 124 | 19 / 29 |
+| `presentation` | **0%** (0/251) | **0%** (0/251) | 0 / 26 | 0 / 5 |
+| `test` | **96%** (141/144) | **100%** (36/38) | 32 / 35 | 1 / 1 |
+| **Total** | **36%** (1.943/5.264) | **22%** (90/404) | 86 / 185 | 20 / 35 |
 
-## 2. Estado Actual del Laboratorio
+Los tests cubrían correctamente `Player`, `YellowCoin`, `CoinFactory`, `EnemyFactory` básico y el flujo principal de `TheDOPOHardestGame` en modo `PLAYER`. Sin embargo, **10 clases del dominio no tenían ningún test** y las ramas alternativas de casi todas las clases quedaban sin ejecutar.
 
-> **Estado: Maqueta Completa — Versión Uno**
-> El laboratorio se encuentra completado en su Versión Uno. Se construyó la capa de dominio con jerarquía de clases completa, una interfaz gráfica funcional con Swing y un sistema de juego que detecta colisiones, recoge monedas y determina victoria o derrota.
+Las clases sin cobertura eran:
 
-### Componentes implementados
-
-- **Capa Dominio:** `Entity`, `Player`, `Enemy` (abstracta), `BasicBlueEnemy`, `Coin`, `Position`, `CellType`, `GameMode`, `Skin`
-- **Lógica central:** `TheDOPOHardestGame` con movimiento, colisiones, temporizador y condición de victoria
-- **Configuración dinámica:** `ConfigLoader` parsea `level1.txt` con soporte para `DIMENSIONS`, `TIME`, `START`, `END`, `WALL`, `COIN`, `ENEMY`
-- **Presentación:** `GameWindow` (CardLayout), `MainMenuPanel`, `GamePanel` con pintado en `Graphics`
-- **Pruebas:** 5 tests JUnit 5 — movimiento válido, bloqueo de paredes, colisión con enemigo, recolección de monedas, condición de victoria
-- **Excepción personalizada:** `GameException` para errores de carga de nivel
+- `AcceleratedEnemy` — `move()` nunca ejecutado
+- `VerticalSliderEnemy` — `move()` nunca ejecutado
+- `ExpertMachine` — `nextMove()` nunca ejecutado
+- `Bomb` — `onPlayerContact()` y `onEnemyContact()` nunca ejecutados
+- `LifeSource` — `onPlayerContact()` nunca ejecutado
+- `SkinCoin` — `onCollected()` nunca ejecutado
+- `SaveManager` — depende de I/O del sistema
+- `TheDOPOHardestGame` — modos PvM y PvP sin cubrir
 
 ---
 
-## 3. Práctica XP Más Útil
+## 2. Lo que Hicimos para Mejorar la Cobertura
 
-**Diseño Simple (Simple Design)**
+Se añadieron **24 tests nuevos** (de 28 a 52) enfocados exclusivamente en las clases y ramas sin cubrir. La estrategia fue cubrir primero las **ramas** (cada `if/else` con al menos un camino verdadero y uno falso) y luego las instrucciones faltantes.
 
-Al construir ciclo a ciclo — primero la jerarquía de clases, luego el `ConfigLoader`, después las colisiones y finalmente la interfaz gráfica — cada integración fue limpia sin romper lo anterior.
+### Tests añadidos por grupo
 
-Aplicación concreta en el código:
+**`VerticalSliderEnemy` — 2 tests**
+- Movimiento normal hacia abajo
+- Rebote al llegar a pared inferior (rama `direction *= -1`)
 
-- La clase abstracta `Enemy` define únicamente `move(TheDOPOHardestGame)`, obligando a `BasicBlueEnemy` a implementar solo lo que necesita.
-- `ConfigLoader` separa completamente la lectura del archivo de la lógica del juego, evitando acoplamiento.
-- `GamePanel` delega toda la lógica a `TheDOPOHardestGame`; solo pinta y escucha eventos de teclado.
+**`AcceleratedEnemy` — 2 tests**
+- Avance de 2 celdas por tick sin obstáculos
+- Rebote al llegar a pared (rama `direction *= -1` dentro del loop)
+
+**`PatrolEnemy` — 1 test adicional**
+- Ruta completa de 3 waypoints con retorno al inicio (ciclo completo)
+- Error al tener menos de 2 waypoints (rama de excepción)
+
+**`Bomb` — 2 tests**
+- Jugador pisa la bomba → muerte y desactivación
+- Enemigo pisa la bomba → eliminado del juego y desactivación
+
+**`LifeSource` — 2 tests**
+- Jugador con muertes pisa la fuente → `reduceDeath()` verificado
+- Desactivación tras primer contacto
+
+**`SkinCoin` — 3 tests**
+- Recolección de skin BLUE → `getActiveSkin()` cambia
+- Recolección de skin GREEN → activa escudo (rama de `applySkin` con GREEN)
+- Recolección de segunda skin → reemplaza la anterior (rama `resetSkin` + `applySkin`)
+
+**`ExpertMachine` — 2 tests**
+- Con monedas: se mueve en dirección Manhattan hacia la moneda más cercana
+- Sin monedas: se mueve hacia `SAFE_END`
+
+**`Player` — tests de ramas adicionales**
+- Skin temporal BLUE → `getSpeed()` devuelve 2 (rama de `temporarySkin`)
+- Muerte con skin temporal → `resetSkin()` restaura original
+- Verde con escudo absorbe golpe → `isSlowedDown()` activado
+
+**`TheDOPOHardestGame` — tests de casos límite**
+- Victoria bloqueada cuando hay monedas pendientes
+- No se mueve tras alcanzar victoria (`isVictory` bloquea)
+- Tiempo no baja de 0 tras game over
+- `removeEnemy()` elimina correctamente el enemigo de la lista
+- `isValidPosition()` para coordenadas válidas (rama positiva)
+
+**`Position` — 2 tests**
+- `setRow()` y `setCol()` verificados
+- Desigualdad por fila diferente y por columna diferente
 
 ---
 
-## 4. Mayor Logro
+## 3. Interpretación de los Datos
 
-**Sistema de detección de colisiones y respawn**
+### Resultado final estimado tras los nuevos tests
 
-El mayor logro fue implementar `checkCollisions()` de manera que un único método maneja tanto la recolección de monedas como el respawn del jugador al colisionar con un enemigo, sin duplicar código y respetando el principio de responsabilidad única.
+| Paquete | Cobertura instrucciones | Cobertura ramas |
+|---|---|---|
+| `domain` | 36% → **~62%** | 28% → **~55%** |
+| `presentation` | 0% (sin cambios, ver nota) | 0% (sin cambios) |
+| `test` | 96% → **~98%** | 100% |
+| **Total** | 36% → **~52%** | 22% → **~45%** |
 
-```java
-// Una sola línea gestiona toda la recolección de monedas
-coins.removeIf(coin -> coin.getPosition().equals(player.getPosition()));
-```
+### Qué significa cada número
 
-Esto fue posible gracias al override correcto de `equals()` en `Position`. Además, el respawn actualiza el punto de control dinámicamente al pisar celdas `SAFE_MID`, dando profundidad al diseño del nivel sin lógica extra en `GamePanel`.
+**36% inicial en dominio** indica que la mayoría de las clases nuevas añadidas en los últimos ciclos (enemigos nuevos, elementos especiales, máquinas) se desarrollaron sin pruebas paralelas. El código funcionaba visualmente pero no tenía verificación automatizada.
 
----
+**28% de ramas** es el dato más crítico. Significa que aunque algunas instrucciones se ejecutaban, los caminos alternativos (rebotes, escudos, modos de juego distintos) nunca se verificaban. Un bug en el rebote de `AcceleratedEnemy` o en la lógica del escudo verde habría pasado completamente desapercibido.
 
-## 5. Mayor Problema Técnico y Solución
+**0% en presentación** es aceptable. La capa Swing depende del EDT y su comportamiento no es determinista en entornos de prueba. Testear `GamePanel` con JUnit estándar requeriría AssertJ Swing o TestFX, herramientas fuera del alcance de este curso. La verificación de presentación se realizó de forma manual ejecutando el juego.
 
-| | Detalle |
-|---|---|
-| **Problema** | El movimiento del `BasicBlueEnemy` causaba un `ArrayIndexOutOfBoundsException` al revertir dirección, ya que el enemigo se salía de los límites del tablero. |
-| **Solución** | Se delegó la validación al método `isValidPosition()` de `TheDOPOHardestGame` antes de mover al enemigo. `BasicBlueEnemy` invierte su dirección si la celda siguiente es inválida o es `WALL`, respetando los límites del tablero. |
+**96% en test** confirma que los helpers `makeBoard()` y `makeGame()` se usan correctamente en casi todos los tests.
 
----
+### Limitaciones que persisten
 
-## 6. Análisis del Trabajo en Equipo
-
-### ¿Qué hicimos bien?
-
-- Dividimos la capa de dominio y la capa de presentación desde el inicio, lo que evitó conflictos de integración.
-- Usamos una jerarquía clara (`Entity` → `Player` / `Enemy` / `Coin`) que permitió agregar `BasicBlueEnemy` sin tocar código existente.
-- Las 5 pruebas JUnit cubren los flujos críticos y funcionaron como red de seguridad durante los cambios.
-
-### Compromiso de mejora
-
-- Implementar **Pair Programming** para los próximos modos de juego (PVP, PVM), ya que la lógica de múltiples jugadores requerirá revisión inmediata del código.
-- Agregar más tipos de enemigos y zonas intermedias (`SAFE_MID`) al nivel para aumentar la dificultad progresivamente.
-- Incluir la retrospectiva en cada ciclo de entrega como documento vivo, no solo al final.
-
----
-
-## 7. Referencias Bibliográficas
-
-- Oracle. (2026). *Java Swing — Painting in AWT and Swing*. Java Tutorials. https://docs.oracle.com/javase/tutorial/uiswing/painting/
-- Deitel, P., & Deitel, H. (2017). *Java: How to Program (Early Objects)*. Pearson Education. (Referencia para herencia, clases abstractas e interfaces en Java.)
-- JUnit Team. (2026). *JUnit 5 User Guide*. https://junit.org/junit5/docs/current/user-guide/
-
-> **La más útil:** La documentación oficial de Oracle sobre `KeyListener` y `paintComponent`, que proporcionó el patrón correcto para capturar eventos de teclado sin bloquear el hilo de Swing.
+- `SaveManager` sigue sin tests porque sus métodos abren diálogos `JFileChooser` y escriben archivos reales en disco. Para testearlo correctamente se necesitaría Mockito para inyectar el chooser, o refactorizar para separar la lógica de I/O de la interfaz gráfica.
+- El modo PvP completo (colisión entre jugadores, `SAFE_MID_2`) sigue parcialmente sin cubrir porque el constructor PvP inicializa `player2` buscando `SAFE_END` en el tablero, lo que requiere un tablero más elaborado que el `makeBoard()` básico de 5×5.
+- La cobertura real final depende de que el equipo integre los 52 tests en el proyecto y ejecute JaCoCo nuevamente para confirmar los porcentajes.
