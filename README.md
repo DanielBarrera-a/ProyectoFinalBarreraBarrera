@@ -1,13 +1,13 @@
-#  The DOPO Hardest Game
+# 🎮 The DOPO Hardest Game
 
 > **Institución:** Escuela Colombiana de Ingeniería Julio Garavito  
 > **Asignatura:** Proyecto Final  
-> **Equipo:** [NOMBRE INTEGRANTE 1] · [NOMBRE INTEGRANTE 2]  
+> **Equipo:** HEVER BARRERA  · DANIEL BARRERA  
 > **Stack:** Java 21 · Maven 3.x · JUnit 5 · JaCoCo 0.8.11
 
 ---
 
-##  Tabla de contenidos
+## 📋 Tabla de contenidos
 
 1. [Carta de presentación](#1--carta-de-presentación)
 2. [Guía de comandos](#2--guía-de-comandos)
@@ -113,125 +113,67 @@ mvn pmd:check
 
 ### ¿Qué es PMD?
 
-PMD es una herramienta de análisis estático que examina el código fuente Java **sin ejecutarlo** e identifica posibles problemas: código muerto, variables no usadas, métodos demasiado largos, complejidad ciclomática elevada, violaciones de nomenclatura y patrones de código propensos a errores.
+PMD es una herramienta de análisis estático que examina el código fuente Java **sin ejecutarlo** e identifica posibles problemas: código muerto, imports no usados, métodos demasiado largos, complejidad ciclomática elevada y patrones de código propensos a errores.
 
-### Configuración en `pom.xml`
+### Cómo ejecutarlo
 
-Para habilitar PMD en el proyecto, agrega el siguiente plugin dentro de la sección `<build><plugins>`:
+Con el plugin `maven-pmd-plugin:3.23.0` ya configurado en el `pom.xml`, basta ejecutar desde la raíz del proyecto:
 
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-pmd-plugin</artifactId>
-    <version>3.21.0</version>
-    <configuration>
-        <rulesets>
-            <ruleset>/rulesets/java/quickstart.xml</ruleset>
-        </rulesets>
-        <failOnViolation>false</failOnViolation>
-        <printFailingErrors>true</printFailingErrors>
-        <excludes>
-            <exclude>**/presentation/**</exclude>
-        </excludes>
-    </configuration>
-</plugin>
+```bash
+mvn pmd:pmd
 ```
 
-### Cómo interpretar el reporte
+El reporte HTML queda en `target/site/pmd.html`. Ábrelo con clic derecho → **Open In → Browser** desde IntelliJ.
 
-Una vez ejecutado `mvn pmd:mmd`, el reporte HTML en `target/site/pmd.html` organiza las violaciones por:
+### Resultados obtenidos — PMD 7.0.0
 
-| Campo        | Significado                                                      |
-|--------------|------------------------------------------------------------------|
-| **Regla**    | Nombre de la regla PMD que se violó                              |
-| **Prioridad**| 1 (crítica) → 5 (informativa)                                    |
-| **Archivo**  | Clase donde se detectó el problema                               |
-| **Línea**    | Línea exacta del código fuente                                   |
-| **Mensaje**  | Descripción del problema y recomendación                         |
+El análisis se ejecutó sobre el paquete `domain` (el paquete `presentation` fue excluido explícitamente). Se encontraron **4 violaciones en 3 archivos**, lo que refleja un código bastante limpio en general.
 
-### Categorías de reglas aplicadas
+#### Resumen de violaciones
 
-- **Best Practices:** uso correcto de `@Override`, evitar `System.out` en producción, no capturar `Exception` genérica.
-- **Code Style:** nombres de variables y métodos en camelCase, constantes en UPPER_SNAKE_CASE.
-- **Design:** métodos con demasiadas responsabilidades, clases con alta complejidad ciclomática (> 10).
-- **Error Prone:** comparaciones con `==` en objetos, uso de `new` en tipos primitivos envueltos.
-- **Performance:** uso de `StringBuffer` donde basta `StringBuilder`, concatenación en bucles.
+| Archivo | Regla | Violación | Prioridad | Línea |
+|---------|-------|-----------|:---------:|:-----:|
+| `TheDOPOHardestGame.java` | `CollapsibleIfStatements` | Este `if` podría combinarse con su padre | 3 | 204 |
+| `TheDOPOHardestGame.java` | `CollapsibleIfStatements` | Este `if` podría combinarse con su padre | 3 | 212 |
+| `PatrolEnemy.java` | `UnnecessaryImport` | Import no usado: `java.util.ArrayList` | 4 | 6 |
+| `SaveManager.java` | `UnnecessaryImport` | Import no usado: `javax.swing.*` | 4 | 3 |
+| `SaveManager.java` | `UnnecessaryImport` | Import no usado: `java.io.*` | 4 | 5 |
 
-### Principales hallazgos esperados en este proyecto
+#### Análisis de cada violación
 
-Dado el diseño del proyecto, las violaciones más probables se concentran en:
+**`TheDOPOHardestGame.java` — `CollapsibleIfStatements` (Prioridad 3)**
 
-- **`TheDOPOHardestGame`**: complejidad ciclomática elevada en `checkCollisions`, `moveEnemies` y `checkZone` por la cantidad de ramas condicionales que gestionan los distintos modos de juego.
-- **`ConfigLoader`**: método de parseo con alta complejidad por el manejo de múltiples tokens y tipos de entidad.
-- **`GamePanel`** *(excluido del análisis)*: lógica de renderizado y eventos mezclada en un solo listener.
+En las líneas 204 y 212 hay dos `if` anidados que PMD sugiere combinar en uno solo usando `&&`. Por ejemplo, un patrón como:
 
-> Los reportes concretos se obtienen ejecutando `mvn pmd:mmd` sobre el código fuente. Los resultados varían según la versión del ruleset y la configuración del plugin.
+```
+if (condicionA) {
+    if (condicionB) { ... }
+}
+```
+
+podría reescribirse como `if (condicionA && condicionB) { ... }` para mejorar la legibilidad. Estas dos líneas están dentro de la lógica de colisiones o movimiento de enemigos, zona de mayor complejidad de la clase. La funcionalidad es correcta; es solo una sugerencia de estilo.
+
+**`PatrolEnemy.java` — `UnnecessaryImport` (Prioridad 4)**
+
+El import `java.util.ArrayList` en la línea 6 no se referencia directamente en el cuerpo de la clase. Probablemente quedó de una versión anterior donde se usaba una lista local. Se puede eliminar sin ningún efecto.
+
+**`SaveManager.java` — `UnnecessaryImport` (Prioridad 4)**
+
+Los imports `javax.swing.*` y `java.io.*` aparecen en las líneas 3 y 5 pero no se usan directamente en el código de la clase. Dado que `SaveManager` delega en `JFileChooser` (componente Swing), estos imports pueden ser residuos de refactorizaciones anteriores o estar cubiertos por importaciones más específicas en otro punto.
+
+### Conclusión del análisis estático
+
+El proyecto muestra un nivel de calidad estática muy alto: solo **4 violaciones de prioridad media-baja** en todo el paquete `domain`. No se detectaron problemas críticos (prioridad 1 o 2) como código muerto, variables sin inicializar, capturas de `Exception` genérica ni comparaciones incorrectas de objetos. La principal área de mejora señalada por PMD es simplificar dos condicionales anidados en `TheDOPOHardestGame`, la clase con mayor complejidad ciclomática del proyecto.
 
 ---
 
 ## 4 · Diagrama de clases y patrones de diseño
 
-### Estructura general de paquetes
+<!-- Reemplaza las líneas de abajo con tus imágenes. Ejemplo: ![Diagrama](ruta/imagen.png) -->
 
-```
-src/
-├── main/java/
-│   ├── domain/          ← Lógica del juego (sin dependencias de UI)
-│   └── presentation/    ← Interfaz gráfica Swing/AWT
-└── test/java/
-    └── test/            ← Tests unitarios JUnit 5
-```
+![Diagrama de clases](diagrama-clases.png)
 
-### Patrones de diseño identificados
-
-#### 4.1 — Factory Method (×4)
-
-El proyecto aplica el patrón **Factory Method** en cuatro fábricas del paquete `domain`. Cada fábrica centraliza la creación de objetos polimórficos mediante un `switch` sobre un tipo `String` leído del archivo de nivel. Añadir un nuevo subtipo nunca requiere modificar el motor del juego.
-
-| Fábrica                  | Produce           | Tipos disponibles                              |
-|--------------------------|-------------------|------------------------------------------------|
-| `EnemyFactory`           | `Enemy`           | `BASIC_BLUE`, `TYPE_V`, `TYPE_A`, `PATROL`     |
-| `CoinFactory`            | `Coin`            | `YELLOW`, `RED_SKIN`, `BLUE_SKIN`, `GREEN_SKIN`|
-| `SpecialElementFactory`  | `SpecialElement`  | `BOMB`, `LIFE_SOURCE`                          |
-| `MachineFactory`         | `MachinePlayer`   | `RANDOM`, `EXPERT`                             |
-
-Todas lanzan `GameException` si reciben un tipo desconocido, garantizando fallo rápido y mensaje descriptivo.
-
-#### 4.2 — Strategy
-
-El patrón **Strategy** se aplica en el modo PVM a través de la interfaz `MachinePlayer`. El motor del juego (`TheDOPOHardestGame`) llama a `machine.nextMove(game, player2)` sin saber qué implementación concreta está usando:
-
-- **`RandomMachine`:** estrategia aleatoria — elige una dirección al azar entre las 8 posibles.
-- **`ExpertMachine`:** estrategia heurística — se mueve hacia la moneda más cercana usando distancia Manhattan; si no hay monedas, va hacia `SAFE_END`.
-
-El perfil activo se puede cambiar en tiempo de ejecución mediante `game.setMachine(MachineFactory.create("EXPERT"))`, sin modificar ninguna otra clase.
-
-#### 4.3 — Template Method (implícito en la jerarquía de abstracciones)
-
-Las clases abstractas `Enemy`, `Coin` y `SpecialElement` definen un contrato de métodos que cada subtipo debe implementar (`move`, `draw`, `onCollected`, `onPlayerContact`, etc.). El motor del juego invoca estos métodos sobre listas polimórficas, delegando el comportamiento concreto a cada subclase. Este patrón garantiza que el motor permanezca **cerrado a modificación** aunque el juego esté **abierto a extensión** (principio OCP).
-
-### Jerarquía de clases clave
-
-```
-Entity (abstract, Serializable)
- ├── Enemy (abstract)
- │    ├── BasicBlueEnemy
- │    ├── VerticalSliderEnemy
- │    ├── AcceleratedEnemy
- │    └── PatrolEnemy
- ├── Coin (abstract)
- │    ├── YellowCoin
- │    └── SkinCoin
- └── Player
-
-SpecialElement (abstract, Serializable)
- ├── Bomb
- └── LifeSource
-
-MachinePlayer (interface, Serializable)
- ├── RandomMachine
- └── ExpertMachine
-```
+![Patrones de diseño](patrones-diseno.png)
 
 ---
 
