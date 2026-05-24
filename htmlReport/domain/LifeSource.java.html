@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LifeSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">LifeSource.java</span></div><h1>LifeSource.java</h1><pre class="source lang-java linenums">package domain;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+/**
+ * Fuente de vida estática del tablero.
+ * Al ser pisada por un jugador: reduce en 1 su contador de muertes (vida extra).
+ * Los enemigos la ignoran completamente.
+ * Se desactiva tras ser usada una vez.
+ */
+public class LifeSource extends SpecialElement {
+    private static final long serialVersionUID = 1L;
+
+    public LifeSource(Position position) {
+<span class="nc" id="L16">        super(position);</span>
+<span class="nc" id="L17">    }</span>
+
+    @Override
+    public void onPlayerContact(Player player, TheDOPOHardestGame game) {
+<span class="nc" id="L21">        deactivate();</span>
+<span class="nc" id="L22">        player.reduceDeath(); // ya existe en Player</span>
+<span class="nc" id="L23">    }</span>
+
+    @Override
+    public void onEnemyContact(Enemy enemy, TheDOPOHardestGame game) {
+        // Los enemigos no interactúan con fuentes de vida
+<span class="nc" id="L28">    }</span>
+
+    @Override
+    public void draw(Graphics g, int offsetX, int offsetY, int cellSize) {
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (!active) return;</span>
+<span class="nc" id="L33">        int x = offsetX + position.getCol() * cellSize;</span>
+<span class="nc" id="L34">        int y = offsetY + position.getRow() * cellSize;</span>
+
+        // Cruz de primeros auxilios (fondo blanco, cruz roja)
+<span class="nc" id="L37">        g.setColor(new Color(220, 255, 220));</span>
+<span class="nc" id="L38">        g.fillRoundRect(x + 5, y + 5, cellSize - 10, cellSize - 10, 6, 6);</span>
+
+<span class="nc" id="L40">        g.setColor(new Color(0, 180, 0));</span>
+<span class="nc" id="L41">        g.drawRoundRect(x + 5, y + 5, cellSize - 10, cellSize - 10, 6, 6);</span>
+
+        // Cruz
+<span class="nc" id="L44">        g.setColor(new Color(0, 180, 0));</span>
+<span class="nc" id="L45">        int cx = x + cellSize / 2;</span>
+<span class="nc" id="L46">        int cy = y + cellSize / 2;</span>
+<span class="nc" id="L47">        g.fillRect(cx - 2, cy - 8, 4, 16); // vertical</span>
+<span class="nc" id="L48">        g.fillRect(cx - 8, cy - 2, 16, 4); // horizontal</span>
+<span class="nc" id="L49">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

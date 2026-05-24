@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpertMachine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">ExpertMachine.java</span></div><h1>ExpertMachine.java</h1><pre class="source lang-java linenums">package domain;
+
+import java.util.List;
+
+/**
+ * Perfil de maquina experta para el modo PvM.
+ * Su estrategia es:
+ * 1. Si hay monedas pendientes, se mueve hacia la moneda más cercana.
+ * 2. Si no hay monedas, se mueve hacia la celda SAFE_END.
+ * 3. Evita paredes calculando el paso que más reduce la distancia Manhattan.
+ */
+<span class="fc" id="L12">public class ExpertMachine implements MachinePlayer {</span>
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L15">    private static final int[][] DIRECTIONS = {</span>
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1},
+            {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
+    };
+
+    @Override
+    public int[] nextMove(TheDOPOHardestGame game, Player machine) {
+<span class="nc" id="L22">        Position target = findTarget(game);</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">        if (target == null) return new int[]{0, 0};</span>
+<span class="nc" id="L24">        return bestMoveToward(game, machine.getPosition(), target);</span>
+    }
+
+    /**
+     * Encuentra el objetivo más prioritario: la moneda más cercana o el SAFE_END.
+     */
+    private Position findTarget(TheDOPOHardestGame game) {
+<span class="nc" id="L31">        Position current = game.getPlayer2().getPosition();</span>
+<span class="nc" id="L32">        List&lt;Coin&gt; coins = game.getCoins();</span>
+
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (!coins.isEmpty()) {</span>
+<span class="nc" id="L35">            Position nearest = null;</span>
+<span class="nc" id="L36">            int minDist = Integer.MAX_VALUE;</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">            for (Coin coin : coins) {</span>
+<span class="nc" id="L38">                int dist = manhattan(current, coin.getPosition());</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">                if (dist &lt; minDist) {</span>
+<span class="nc" id="L40">                    minDist = dist;</span>
+<span class="nc" id="L41">                    nearest = coin.getPosition();</span>
+                }
+<span class="nc" id="L43">            }</span>
+<span class="nc" id="L44">            return nearest;</span>
+        }
+
+        // Sin monedas: busca la celda SAFE_END en el tablero
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (int r = 0; r &lt; game.getRows(); r++) {</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">            for (int c = 0; c &lt; game.getCols(); c++) {</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">                if (game.getCell(r, c) == CellType.SAFE_END) {</span>
+<span class="nc" id="L51">                    return new Position(r, c);</span>
+                }
+            }
+        }
+<span class="nc" id="L55">        return null;</span>
+    }
+
+    /**
+     * Elige la direccion que más reduce la distancia Manhattan al objetivo,
+     * ignorando movimientos hacia paredes o fuera del tablero.
+     */
+    private int[] bestMoveToward(TheDOPOHardestGame game, Position from, Position target) {
+<span class="nc" id="L63">        int[] best = {0, 0};</span>
+<span class="nc" id="L64">        int bestDist = manhattan(from, target);</span>
+
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        for (int[] dir : DIRECTIONS) {</span>
+<span class="nc" id="L67">            int nr = from.getRow() + dir[0];</span>
+<span class="nc" id="L68">            int nc = from.getCol() + dir[1];</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (!game.isValidPosition(nr, nc)) continue;</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (game.getCell(nr, nc) == CellType.WALL) continue;</span>
+<span class="nc" id="L71">            int dist = manhattan(new Position(nr, nc), target);</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">            if (dist &lt; bestDist) {</span>
+<span class="nc" id="L73">                bestDist = dist;</span>
+<span class="nc" id="L74">                best = dir;</span>
+            }
+        }
+<span class="nc" id="L77">        return best;</span>
+    }
+
+    private int manhattan(Position a, Position b) {
+<span class="nc" id="L81">        return Math.abs(a.getRow() - b.getRow()) + Math.abs(a.getCol() - b.getCol());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

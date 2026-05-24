@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpecialElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">SpecialElement.java</span></div><h1>SpecialElement.java</h1><pre class="source lang-java linenums">package domain;
+
+import java.awt.Graphics;
+import java.io.Serializable;
+
+/**
+ * Clase abstracta que representa un elemento especial del tablero.
+ * Para agregar un nuevo elemento especial, solo se crea una nueva subclase.
+ * No se modifica TheDOPOHardestGame ni ConfigLoader.
+ */
+public abstract class SpecialElement implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    protected Position position;
+    protected boolean active; // false = ya fue usado, no se dibuja ni aplica
+
+<span class="nc" id="L17">    public SpecialElement(Position position) {</span>
+<span class="nc" id="L18">        this.position = new Position(position.getRow(), position.getCol());</span>
+<span class="nc" id="L19">        this.active = true;</span>
+<span class="nc" id="L20">    }</span>
+
+    /**
+     * Define qué ocurre cuando un jugador pisa este elemento.
+     */
+    public abstract void onPlayerContact(Player player, TheDOPOHardestGame game);
+
+    /**
+     * Define qué ocurre cuando un enemigo pisa este elemento.
+     */
+    public abstract void onEnemyContact(Enemy enemy, TheDOPOHardestGame game);
+
+    /**
+     * Define cómo se dibuja este elemento en pantalla.
+     */
+    public abstract void draw(Graphics g, int offsetX, int offsetY, int cellSize);
+
+<span class="nc" id="L37">    public Position getPosition() { return position; }</span>
+<span class="nc" id="L38">    public boolean isActive()     { return active; }</span>
+<span class="nc" id="L39">    public void deactivate()      { active = false; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

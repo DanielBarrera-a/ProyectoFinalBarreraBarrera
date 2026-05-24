@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package domain;
+
+/**
+ * Esta clase representa al jugador del juego.
+ * Hereda de Entity.
+ */
+public class Player extends Entity {
+    private static final long serialVersionUID = 1L;
+
+    private int deaths;
+    private Position respawnPosition;
+    private Skin skin;
+    private Skin originalSkin;       // skin original del jugador
+    private Skin temporarySkin;      // skin temporal por moneda skin (null = sin efecto)
+
+    // Estos son los atributos que va a usar el verde
+    private boolean shield;
+    private boolean slowedDown;
+
+    public Player(Position position, Skin skin) {
+<span class="fc" id="L21">        super(new Position(position.getRow(), position.getCol()));</span>
+<span class="fc" id="L22">        this.skin = skin;</span>
+<span class="fc" id="L23">        this.originalSkin = skin;</span>
+<span class="fc" id="L24">        this.temporarySkin = null;</span>
+<span class="fc" id="L25">        this.deaths = 0;</span>
+<span class="fc" id="L26">        this.respawnPosition = new Position(position.getRow(), position.getCol());</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        this.shield = (skin == Skin.GREEN);</span>
+<span class="fc" id="L28">        this.slowedDown = false;</span>
+<span class="fc" id="L29">    }</span>
+
+    public int getSpeed() {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        Skin active = (temporarySkin != null) ? temporarySkin : skin;</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (active == Skin.BLUE) return 2;</span>
+<span class="pc bpc" id="L34" title="3 of 4 branches missed.">        if (active == Skin.GREEN &amp;&amp; slowedDown) return 1;</span>
+<span class="fc" id="L35">        return 1;</span>
+    }
+
+    /** Aplica una skin temporal por moneda skin. */
+    public void applySkin(Skin newSkin) {
+<span class="fc" id="L40">        this.temporarySkin = newSkin;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        this.shield = (newSkin == Skin.GREEN);</span>
+<span class="fc" id="L42">        this.slowedDown = false;</span>
+<span class="fc" id="L43">    }</span>
+
+    /** Recupera la skin original (al morir o al recoger otra moneda). */
+    public void resetSkin() {
+<span class="fc" id="L47">        this.temporarySkin = null;</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        this.shield = (originalSkin == Skin.GREEN);</span>
+<span class="fc" id="L49">        this.slowedDown = false;</span>
+<span class="fc" id="L50">    }</span>
+
+    /** Devuelve la skin activa (temporal si hay, si no la original). */
+    public Skin getActiveSkin() {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        return (temporarySkin != null) ? temporarySkin : skin;</span>
+    }
+
+    public boolean applyEnemyHit() {
+<span class="fc bfc" id="L58" title="All 4 branches covered.">        if (getActiveSkin() == Skin.GREEN &amp;&amp; shield) {</span>
+<span class="fc" id="L59">            shield = false;</span>
+<span class="fc" id="L60">            slowedDown = true;</span>
+<span class="fc" id="L61">            return false;</span>
+        }
+<span class="fc" id="L63">        addDeath();</span>
+<span class="fc" id="L64">        resetSkin(); // recupera skin original al morir</span>
+<span class="fc" id="L65">        return true;</span>
+    }
+
+    public void resetShield() {
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (skin == Skin.GREEN) {</span>
+<span class="nc" id="L70">            shield = true;</span>
+<span class="nc" id="L71">            slowedDown = false;</span>
+        }
+<span class="fc" id="L73">    }</span>
+
+    public boolean isShielded() {
+<span class="nc" id="L76">        return shield;</span>
+    }
+
+    public boolean isSlowedDown() {
+<span class="nc" id="L80">        return slowedDown;</span>
+    }
+
+    public int getDeaths() {
+<span class="fc" id="L84">        return deaths;</span>
+    }
+
+    public void addDeath() {
+<span class="fc" id="L88">        deaths++;</span>
+<span class="fc" id="L89">    }</span>
+
+    public void reduceDeath() {
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (deaths &gt; 0) deaths--;</span>
+<span class="fc" id="L93">    }</span>
+
+    public Skin getSkin() {
+<span class="nc" id="L96">        return skin;</span>
+    }
+
+    public Position getRespawnPosition() {
+<span class="fc" id="L100">        return respawnPosition;</span>
+    }
+
+    public void setRespawnPosition(Position pos) {
+<span class="fc" id="L104">        this.respawnPosition = new Position(pos.getRow(), pos.getCol());</span>
+<span class="fc" id="L105">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

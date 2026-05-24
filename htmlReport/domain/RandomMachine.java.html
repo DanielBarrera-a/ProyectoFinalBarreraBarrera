@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RandomMachine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">RandomMachine.java</span></div><h1>RandomMachine.java</h1><pre class="source lang-java linenums">package domain;
+
+import java.util.Random;
+
+/**
+ * Perfil de maquina aleatoria para el modo PvM.
+ * En cada tick elige una dirección al azar entre las 8 posibles (incluyendo diagonal).
+ * No tiene ninguna estrategia: puede quedarse quieta o moverse hacia atrás.
+ */
+<span class="fc" id="L10">public class RandomMachine implements MachinePlayer {</span>
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L13">    private final Random random = new Random();</span>
+
+    // Las 8 direcciones posibles (incluyendo diagonal y quieto)
+<span class="fc" id="L16">    private static final int[][] DIRECTIONS = {</span>
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1},
+            {-1, -1}, {-1, 1}, {1, -1}, {1, 1},
+            {0, 0}
+    };
+
+    @Override
+    public int[] nextMove(TheDOPOHardestGame game, Player machine) {
+<span class="fc" id="L24">        return DIRECTIONS[random.nextInt(DIRECTIONS.length)];</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

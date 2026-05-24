@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfigLoader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">ConfigLoader.java</span></div><h1>ConfigLoader.java</h1><pre class="source lang-java linenums">package domain;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Carga la configuración de un nivel desde un archivo .txt.
+ * SRP: Su única responsabilidad es leer el archivo y construir el juego.
+ * OCP: No instancia enemigos ni monedas directamente. Delega eso a las
+ * fábricas (EnemyFactory, CoinFactory). Para agregar un nuevo tipo de
+ * entidad, no se toca este archivo.
+ */
+<span class="nc" id="L16">public class ConfigLoader {</span>
+
+    /**
+     * Objeto interno para acumular los datos del nivel mientras se lee el archivo.
+     */
+<span class="nc" id="L21">    private static class ParseContext {</span>
+<span class="nc" id="L22">        int time = 60;</span>
+<span class="nc" id="L23">        CellType[][] board = null;</span>
+<span class="nc" id="L24">        Position startPos = null;</span>
+<span class="nc" id="L25">        List&lt;Enemy&gt; enemies = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L26">        List&lt;Coin&gt; coins = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L27">        List&lt;SpecialElement&gt; specialElements = new ArrayList&lt;&gt;();</span>
+    }
+
+    /**
+     * Lee un archivo de nivel y construye una instancia de TheDOPOHardestGame
+     *
+     * @param filepath Ruta del archivo .txt del nivel
+     * @param mode     Modo de juego (PLAYER, PVP, PVM)
+     * @param skin     Skin seleccionada por el jugador
+     * @return Instancia del juego lista para jugar
+     * @throws GameException Si el archivo tiene errores o formato invalido
+     */
+    public static TheDOPOHardestGame loadConfig(String filepath, GameMode mode, Skin skin) throws GameException {
+<span class="nc" id="L40">        ParseContext context = new ParseContext();</span>
+
+<span class="nc" id="L42">        try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {</span>
+            String line;
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L45">                processLine(line.trim(), context);</span>
+            }
+<span class="nc" id="L47">        } catch (IOException e) {</span>
+<span class="nc" id="L48">            throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);</span>
+<span class="nc" id="L49">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L50">            throw new GameException(GameException.ERROR_FORMATO_NUMERO);</span>
+<span class="nc" id="L51">        } catch (ArrayIndexOutOfBoundsException e) {</span>
+<span class="nc" id="L52">            throw new GameException(GameException.ERROR_FUERA_DE_LIMITES);</span>
+<span class="nc" id="L53">        }</span>
+
+<span class="nc bnc" id="L55" title="All 4 branches missed.">        if (context.board == null || context.startPos == null) {</span>
+<span class="nc" id="L56">            throw new GameException(GameException.ERROR_AL_CARGAR_NIVEL);</span>
+        }
+
+<span class="nc" id="L59">        return new TheDOPOHardestGame(</span>
+                context.board, context.startPos,
+                context.enemies, context.coins,
+                context.specialElements,
+                context.time, mode, skin
+        );
+    }
+
+    /**
+     * Procesa una línea del archivo de nivel
+     */
+    private static void processLine(String line, ParseContext context) throws GameException {
+<span class="nc bnc" id="L71" title="All 4 branches missed.">        if (line.isEmpty() || line.startsWith(&quot;#&quot;)) return;</span>
+
+<span class="nc" id="L73">        String[] parts = line.split(&quot; &quot;);</span>
+<span class="nc" id="L74">        String command = parts[0];</span>
+
+<span class="nc bnc" id="L76" title="All 10 branches missed.">        switch (command) {</span>
+            case &quot;DIMENSIONS&quot;:
+<span class="nc" id="L78">                initBoard(parts, context);</span>
+<span class="nc" id="L79">                break;</span>
+            case &quot;TIME&quot;:
+<span class="nc" id="L81">                context.time = Integer.parseInt(parts[1]);</span>
+<span class="nc" id="L82">                break;</span>
+            case &quot;START&quot;:
+<span class="nc" id="L84">                configureStart(parts, context);</span>
+<span class="nc" id="L85">                break;</span>
+            case &quot;MID&quot;:
+<span class="nc" id="L87">                setCell(parts, context, CellType.SAFE_MID);</span>
+<span class="nc" id="L88">                break;</span>
+            case &quot;END&quot;:
+<span class="nc" id="L90">                setCell(parts, context, CellType.SAFE_END);</span>
+<span class="nc" id="L91">                break;</span>
+            case &quot;WALL&quot;:
+<span class="nc" id="L93">                setCell(parts, context, CellType.WALL);</span>
+<span class="nc" id="L94">                break;</span>
+            case &quot;SPECIAL&quot;:
+<span class="nc" id="L96">                registerSpecialElement(parts, context);</span>
+<span class="nc" id="L97">                break;</span>
+            case &quot;COIN&quot;:
+<span class="nc" id="L99">                registerCoin(parts, context);</span>
+<span class="nc" id="L100">                break;</span>
+            case &quot;ENEMY&quot;:
+<span class="nc" id="L102">                registerEnemy(parts, context);</span>
+                break;
+        }
+<span class="nc" id="L105">    }</span>
+
+    private static void initBoard(String[] parts, ParseContext context) {
+<span class="nc" id="L108">        int rows = Integer.parseInt(parts[1]);</span>
+<span class="nc" id="L109">        int cols = Integer.parseInt(parts[2]);</span>
+<span class="nc" id="L110">        context.board = new CellType[rows][cols];</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        for (int i = 0; i &lt; rows; i++) {</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            for (int j = 0; j &lt; cols; j++) {</span>
+<span class="nc" id="L113">                context.board[i][j] = CellType.EMPTY;</span>
+            }
+        }
+<span class="nc" id="L116">    }</span>
+
+    private static void configureStart(String[] parts, ParseContext context) {
+<span class="nc" id="L119">        int r = Integer.parseInt(parts[1]);</span>
+<span class="nc" id="L120">        int c = Integer.parseInt(parts[2]);</span>
+<span class="nc" id="L121">        context.startPos = new Position(r, c);</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (context.board != null) context.board[r][c] = CellType.SAFE_START;</span>
+<span class="nc" id="L123">    }</span>
+
+    private static void setCell(String[] parts, ParseContext context, CellType type) {
+<span class="nc" id="L126">        int r = Integer.parseInt(parts[1]);</span>
+<span class="nc" id="L127">        int c = Integer.parseInt(parts[2]);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (context.board != null) context.board[r][c] = type;</span>
+<span class="nc" id="L129">    }</span>
+
+    /**
+     * Delega la creación de la moneda a CoinFactory.
+     * Si mañana hay un nuevo coin, se escribe en el .txt, solo se agrega el caso en CoinFactory dentro
+     * del contructor de coin
+     */
+    private static void registerCoin(String[] parts, ParseContext context) throws GameException {
+<span class="nc" id="L137">        String type = parts[1];           // Ej: &quot;YELLOW&quot; o &quot;GREEN_MAGIC&quot;</span>
+<span class="nc" id="L138">        int r = Integer.parseInt(parts[2]);</span>
+<span class="nc" id="L139">        int c = Integer.parseInt(parts[3]);</span>
+<span class="nc" id="L140">        context.coins.add(CoinFactory.create(type, new Position(r, c)));</span>
+<span class="nc" id="L141">    }</span>
+
+    private static void registerSpecialElement(String[] parts, ParseContext context) throws GameException {
+<span class="nc" id="L144">        String type = parts[1];           // Ej: &quot;BOMB&quot;, &quot;LIFE_SOURCE&quot;</span>
+<span class="nc" id="L145">        int r = Integer.parseInt(parts[2]);</span>
+<span class="nc" id="L146">        int c = Integer.parseInt(parts[3]);</span>
+<span class="nc" id="L147">        context.specialElements.add(SpecialElementFactory.create(type, new Position(r, c)));</span>
+<span class="nc" id="L148">    }</span>
+
+    /**
+     * Delega la creación del enemigo a EnemyFactory.
+     * Si mañana hay que crear un nuevo enemigo, se escribe en el .txt, solo se agrega el caso en EnemyFactory
+     */
+    private static void registerEnemy(String[] parts, ParseContext context) throws GameException {
+<span class="nc" id="L155">        String type = parts[1];</span>
+<span class="nc" id="L156">        int r = Integer.parseInt(parts[2]);</span>
+<span class="nc" id="L157">        int c = Integer.parseInt(parts[3]);</span>
+<span class="nc bnc" id="L158" title="All 4 branches missed.">        boolean isHorizontal = parts.length &gt; 4 &amp;&amp; parts[4].equals(&quot;HORIZONTAL&quot;);</span>
+<span class="nc" id="L159">        context.enemies.add(EnemyFactory.create(type, new Position(r, c), isHorizontal, parts));</span>
+<span class="nc" id="L160">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

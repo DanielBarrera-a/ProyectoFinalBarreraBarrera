@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameWindow.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">presentation</a> &gt; <span class="el_source">GameWindow.java</span></div><h1>GameWindow.java</h1><pre class="source lang-java linenums">package presentation;
+
+import domain.Gamesave;
+import domain.MachinePlayer;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class GameWindow extends JFrame {
+    private final CardLayout cardLayout;
+    private final JPanel mainPanel;
+<span class="nc" id="L12">    private int currentLevel = 1;</span>
+    private domain.GameMode currentMode;
+    private domain.Skin currentSkin;
+    private MachinePlayer currentMachine;
+
+    private domain.TheDOPOHardestGame currentGame;
+
+<span class="nc" id="L19">    public GameWindow() {</span>
+<span class="nc" id="L20">        setTitle(&quot;The DOPO Hardest Game&quot;);</span>
+<span class="nc" id="L21">        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L22">        setSize(800, 600);</span>
+<span class="nc" id="L23">        setLocationRelativeTo(null);</span>
+<span class="nc" id="L24">        setResizable(false);</span>
+
+<span class="nc" id="L26">        cardLayout = new CardLayout();</span>
+<span class="nc" id="L27">        mainPanel = new JPanel(cardLayout);</span>
+
+<span class="nc" id="L29">        MainMenuPanel mainMenu = new MainMenuPanel(this);</span>
+<span class="nc" id="L30">        mainPanel.add(mainMenu, &quot;MainMenu&quot;);</span>
+
+<span class="nc" id="L32">        add(mainPanel);</span>
+<span class="nc" id="L33">    }</span>
+
+    public void startGame(domain.GameMode mode, domain.Skin skin, MachinePlayer machine) {
+<span class="nc" id="L36">        this.currentMode = mode;</span>
+<span class="nc" id="L37">        this.currentSkin = skin;</span>
+<span class="nc" id="L38">        this.currentMachine = machine;</span>
+<span class="nc" id="L39">        this.currentLevel = 1;</span>
+<span class="nc" id="L40">        loadLevel();</span>
+<span class="nc" id="L41">    }</span>
+
+    private void loadLevel() {
+        try {
+<span class="nc" id="L45">            String levelFile = &quot;level&quot; + currentLevel + &quot;.txt&quot;;</span>
+<span class="nc" id="L46">            currentGame = domain.ConfigLoader.loadConfig(levelFile, currentMode, currentSkin);</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">            if (currentMachine != null) {</span>
+<span class="nc" id="L48">                currentGame.setMachine(currentMachine);</span>
+            }
+<span class="nc" id="L50">            GamePanel gamePanel = new GamePanel(this, currentGame);</span>
+<span class="nc" id="L51">            mainPanel.add(gamePanel, &quot;Game&quot;);</span>
+<span class="nc" id="L52">            cardLayout.show(mainPanel, &quot;Game&quot;);</span>
+<span class="nc" id="L53">            gamePanel.requestFocusInWindow();</span>
+<span class="nc" id="L54">        } catch (domain.GameException e) {</span>
+<span class="nc" id="L55">            JOptionPane.showMessageDialog(this, &quot;¡Felicidades! Has completado todos los niveles.&quot;, &quot;Juego Terminado&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+<span class="nc" id="L56">            showMainMenu();</span>
+<span class="nc" id="L57">        }</span>
+<span class="nc" id="L58">    }</span>
+
+    public void levelCompleted() {
+<span class="nc" id="L61">        currentLevel++;</span>
+<span class="nc" id="L62">        loadLevel();</span>
+<span class="nc" id="L63">    }</span>
+
+    public int getCurrentLevel() {
+<span class="nc" id="L66">        return currentLevel;</span>
+    }
+
+    public void showMainMenu() {
+<span class="nc" id="L70">        cardLayout.show(mainPanel, &quot;MainMenu&quot;);</span>
+<span class="nc" id="L71">    }</span>
+
+    public boolean saveGame() {
+        try {
+<span class="nc" id="L75">            Gamesave save = new Gamesave(currentGame, currentLevel, currentMode, currentSkin);</span>
+<span class="nc" id="L76">            boolean saved = domain.SaveManager.saveGame(save);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (saved) {</span>
+<span class="nc" id="L78">                JOptionPane.showMessageDialog(this, &quot;¡Partida guardada correctamente!&quot;, &quot;Guardar&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+            }
+<span class="nc" id="L80">            return saved;</span>
+<span class="nc" id="L81">        } catch (domain.GameException e) {</span>
+<span class="nc" id="L82">            JOptionPane.showMessageDialog(this, e.getMessage(), &quot;Error al guardar&quot;, JOptionPane.ERROR_MESSAGE);</span>
+<span class="nc" id="L83">            return false;</span>
+        }
+    }
+
+    public void loadSavedGame() {
+        try {
+<span class="nc" id="L89">            Gamesave save = domain.SaveManager.loadGame();</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (save == null) return;</span>
+<span class="nc" id="L91">            this.currentLevel = save.currentLevel();</span>
+<span class="nc" id="L92">            this.currentMode  = save.mode();</span>
+<span class="nc" id="L93">            this.currentSkin  = save.skin();</span>
+<span class="nc" id="L94">            this.currentGame  = save.game();</span>
+<span class="nc" id="L95">            GamePanel gamePanel = new GamePanel(this, currentGame);</span>
+<span class="nc" id="L96">            mainPanel.add(gamePanel, &quot;Game&quot;);</span>
+<span class="nc" id="L97">            cardLayout.show(mainPanel, &quot;Game&quot;);</span>
+<span class="nc" id="L98">            gamePanel.requestFocusInWindow();</span>
+<span class="nc" id="L99">        } catch (domain.GameException e) {</span>
+<span class="nc" id="L100">            JOptionPane.showMessageDialog(this, e.getMessage(), &quot;Error al cargar&quot;, JOptionPane.ERROR_MESSAGE);</span>
+<span class="nc" id="L101">        }</span>
+<span class="nc" id="L102">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

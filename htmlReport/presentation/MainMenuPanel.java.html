@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainMenuPanel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">presentation</a> &gt; <span class="el_source">MainMenuPanel.java</span></div><h1>MainMenuPanel.java</h1><pre class="source lang-java linenums">package presentation;
+
+import domain.GameMode;
+import domain.MachineFactory;
+import domain.Skin;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class MainMenuPanel extends JPanel {
+    private GameWindow window;
+
+<span class="nc" id="L13">    public MainMenuPanel(GameWindow window) {</span>
+<span class="nc" id="L14">        this.window = window;</span>
+<span class="nc" id="L15">        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L16">        setBackground(new Color(230, 230, 250));</span>
+
+<span class="nc" id="L18">        JLabel title = new JLabel(&quot;The DOPO Hardest Game&quot;);</span>
+<span class="nc" id="L19">        title.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 36));</span>
+<span class="nc" id="L20">        title.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+
+<span class="nc" id="L22">        JButton btnPlayer = new JButton(&quot;Modo Player&quot;);</span>
+<span class="nc" id="L23">        btnPlayer.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+<span class="nc" id="L24">        btnPlayer.addActionListener(e -&gt; startGame(GameMode.PLAYER));</span>
+
+<span class="nc" id="L26">        JButton btnPvp = new JButton(&quot;Modo PvsP&quot;);</span>
+<span class="nc" id="L27">        btnPvp.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+<span class="nc" id="L28">        btnPvp.addActionListener(e -&gt; startGame(GameMode.PVP));</span>
+
+<span class="nc" id="L30">        JButton btnPvm = new JButton(&quot;Modo PvsM&quot;);</span>
+<span class="nc" id="L31">        btnPvm.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+<span class="nc" id="L32">        btnPvm.addActionListener(e -&gt; startPvmGame());</span>
+
+        // En esta parte es que se esta agregando la persistencia
+<span class="nc" id="L35">        JButton btnLoad = new JButton(&quot;Cargar partida guardada&quot;);</span>
+<span class="nc" id="L36">        btnLoad.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+<span class="nc" id="L37">        btnLoad.addActionListener(e -&gt; window.loadSavedGame());</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (!domain.SaveManager.hasSave()) {</span>
+<span class="nc" id="L39">            btnLoad.setEnabled(false);</span>
+<span class="nc" id="L40">            btnLoad.setToolTipText(&quot;No hay ninguna partida guardada.&quot;);</span>
+        }
+
+<span class="nc" id="L43">        add(Box.createVerticalStrut(100));</span>
+<span class="nc" id="L44">        add(title);</span>
+<span class="nc" id="L45">        add(Box.createVerticalStrut(50));</span>
+<span class="nc" id="L46">        add(btnPlayer);</span>
+<span class="nc" id="L47">        add(Box.createVerticalStrut(20));</span>
+<span class="nc" id="L48">        add(btnPvp);</span>
+<span class="nc" id="L49">        add(Box.createVerticalStrut(20));</span>
+<span class="nc" id="L50">        add(btnPvm);</span>
+<span class="nc" id="L51">        add(Box.createVerticalStrut(20));</span>
+<span class="nc" id="L52">        add(btnLoad);</span>
+<span class="nc" id="L53">    }</span>
+
+    private void startGame(GameMode mode) {
+<span class="nc" id="L56">        String[] options = {&quot;Rojo (Blinky)&quot;, &quot;Azul (Inky) &quot;, &quot;Verde (Clyde)&quot;};</span>
+<span class="nc" id="L57">        int skinChoice = JOptionPane.showOptionDialog(this, &quot;Selecciona tu cuadrado&quot;, &quot;Selección de Personaje&quot;,</span>
+                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+        Skin skin;
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (skinChoice == 1) {</span>
+<span class="nc" id="L62">            skin = Skin.BLUE;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        } else if (skinChoice == 2) {</span>
+<span class="nc" id="L64">            skin = Skin.GREEN;</span>
+        } else {
+<span class="nc" id="L66">            skin = Skin.RED;</span>
+        }
+<span class="nc" id="L68">        window.startGame(mode, skin, null);</span>
+<span class="nc" id="L69">    }</span>
+
+    private void startPvmGame() {
+<span class="nc" id="L72">        String[] skinOptions = {&quot;Rojo (Blinky)&quot;, &quot;Azul (Inky)&quot;, &quot;Verde (Clyde)&quot;};</span>
+<span class="nc" id="L73">        int skinChoice = JOptionPane.showOptionDialog(this, &quot;Selecciona tu cuadrado&quot;, &quot;Selección de Personaje&quot;,</span>
+                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, skinOptions, skinOptions[0]);
+
+        Skin skin;
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (skinChoice == 1) skin = Skin.BLUE;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        else if (skinChoice == 2) skin = Skin.GREEN;</span>
+<span class="nc" id="L79">        else skin = Skin.RED;</span>
+
+<span class="nc" id="L81">        String[] machineOptions = {&quot;Aleatoria&quot;, &quot;Experta&quot;};</span>
+<span class="nc" id="L82">        int machineChoice = JOptionPane.showOptionDialog(this, &quot;Selecciona el perfil de la máquina&quot;,</span>
+                &quot;Perfil de Máquina&quot;, JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, machineOptions, machineOptions[0]);
+
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        String machineType = (machineChoice == 1) ? &quot;EXPERT&quot; : &quot;RANDOM&quot;;</span>
+
+        try {
+<span class="nc" id="L89">            window.startGame(GameMode.PVM, skin, MachineFactory.create(machineType));</span>
+<span class="nc" id="L90">        } catch (domain.GameException e) {</span>
+<span class="nc" id="L91">            JOptionPane.showMessageDialog(this, e.getMessage(), &quot;Error&quot;, JOptionPane.ERROR_MESSAGE);</span>
+<span class="nc" id="L92">        }</span>
+<span class="nc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

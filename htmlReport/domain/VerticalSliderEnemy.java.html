@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VerticalSliderEnemy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">VerticalSliderEnemy.java</span></div><h1>VerticalSliderEnemy.java</h1><pre class="source lang-java linenums">package domain;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+/**
+ * Deslizador vertical Tipo V.
+ * Se desplaza exclusivamente en línea recta vertical.
+ * Rebota al chocar con paredes superior e inferior.
+ * Dificultad: Baja.
+ * Para definirlo en el .txt se usa:
+ * ENEMY TYPE_V r c
+ */
+public class VerticalSliderEnemy extends Enemy {
+    private static final long serialVersionUID = 1L;
+
+    private int direction; // 1 = abajo, -1 = arriba
+
+    public VerticalSliderEnemy(Position position) {
+<span class="nc" id="L20">        super(position);</span>
+<span class="nc" id="L21">        this.direction = 1;</span>
+<span class="nc" id="L22">    }</span>
+
+    @Override
+    public void move(TheDOPOHardestGame game) {
+<span class="nc" id="L26">        int nextRow = position.getRow() + direction;</span>
+<span class="nc" id="L27">        int nextCol = position.getCol();</span>
+
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (game.isValidPosition(nextRow, nextCol)</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">                &amp;&amp; game.getCell(nextRow, nextCol) != CellType.WALL) {</span>
+<span class="nc" id="L31">            position.setRow(nextRow);</span>
+        } else {
+<span class="nc" id="L33">            direction *= -1; // rebotar</span>
+<span class="nc" id="L34">            int reboundRow = position.getRow() + direction;</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">            if (game.isValidPosition(reboundRow, nextCol)</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">                    &amp;&amp; game.getCell(reboundRow, nextCol) != CellType.WALL) {</span>
+<span class="nc" id="L37">                position.setRow(reboundRow);</span>
+            }
+        }
+<span class="nc" id="L40">    }</span>
+
+    @Override
+    public void draw(Graphics g, int offsetX, int offsetY, int cellSize) {
+<span class="nc" id="L44">        int x = offsetX + position.getCol() * cellSize;</span>
+<span class="nc" id="L45">        int y = offsetY + position.getRow() * cellSize;</span>
+
+        // Rombo azul claro para distinguirlo visualmente
+<span class="nc" id="L48">        g.setColor(new Color(100, 180, 255));</span>
+<span class="nc" id="L49">        int[] xs = { x + cellSize / 2, x + cellSize - 6, x + cellSize / 2, x + 6 };</span>
+<span class="nc" id="L50">        int[] ys = { y + 4, y + cellSize / 2, y + cellSize - 4, y + cellSize / 2 };</span>
+<span class="nc" id="L51">        g.fillPolygon(xs, ys, 4);</span>
+
+        // Contorno
+<span class="nc" id="L54">        g.setColor(Color.BLUE);</span>
+<span class="nc" id="L55">        g.drawPolygon(xs, ys, 4);</span>
+
+        // Letra V
+<span class="nc" id="L58">        g.setColor(Color.WHITE);</span>
+<span class="nc" id="L59">        g.setFont(new java.awt.Font(&quot;Arial&quot;, java.awt.Font.BOLD, 11));</span>
+<span class="nc" id="L60">        g.drawString(&quot;V&quot;, x + cellSize / 2 - 4, y + cellSize / 2 + 5);</span>
+<span class="nc" id="L61">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MachineFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">MachineFactory.java</span></div><h1>MachineFactory.java</h1><pre class="source lang-java linenums">package domain;
+
+/**
+ * Fabrica de perfiles de máquina para el modo PvM.
+ * Para agregar un nuevo perfil, solo se agrega un caso aquí.
+ * No se modifica TheDOPOHardestGame ni GamePanel.
+ */
+<span class="nc" id="L8">public class MachineFactory {</span>
+
+    /**
+     * Crea un perfil de máquina según el tipo solicitado.
+     *
+     * @param type &quot;RANDOM&quot; o &quot;EXPERT&quot;
+     * @return Instancia del perfil correspondiente
+     * @throws GameException Si el tipo no está registrado
+     */
+    public static MachinePlayer create(String type) throws GameException {
+<span class="fc bfc" id="L18" title="All 3 branches covered.">        switch (type) {</span>
+            case &quot;RANDOM&quot;:
+<span class="fc" id="L20">                return new RandomMachine();</span>
+            case &quot;EXPERT&quot;:
+<span class="fc" id="L22">                return new ExpertMachine();</span>
+            default:
+<span class="fc" id="L24">                throw new GameException(&quot;Perfil de máquina desconocido: &quot; + type);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

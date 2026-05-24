@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GamePanel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">presentation</a> &gt; <span class="el_source">GamePanel.java</span></div><h1>GamePanel.java</h1><pre class="source lang-java linenums">package presentation;
+
+import domain.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+/**
+ * Panel principal del juego.
+ * ningun cambio para dibujarla correctamente.
+ */
+public class GamePanel extends JPanel implements ActionListener {
+    private GameWindow window;
+    private TheDOPOHardestGame game;
+    private Timer timer;
+<span class="nc" id="L16">    private final int CELL_SIZE = 40;</span>
+
+    // ── Diagonal: teclas actualmente presionadas ───────────────────────────
+<span class="nc" id="L19">    private final java.util.Set&lt;Integer&gt; pressedKeys = new java.util.HashSet&lt;&gt;();</span>
+
+<span class="nc" id="L21">    public GamePanel(GameWindow window, TheDOPOHardestGame game) {</span>
+<span class="nc" id="L22">        this.window = window;</span>
+<span class="nc" id="L23">        this.game = game;</span>
+<span class="nc" id="L24">        setBackground(Color.WHITE);</span>
+<span class="nc" id="L25">        setFocusable(true);</span>
+
+<span class="nc" id="L27">        addKeyListener(new KeyAdapter() {</span>
+            @Override
+            public void keyPressed(KeyEvent e) {
+<span class="nc" id="L30">                pressedKeys.add(e.getKeyCode());</span>
+<span class="nc bnc" id="L31" title="All 4 branches missed.">                if (game.isVictory() || game.isGameOver()) return;</span>
+
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                if (e.getKeyCode() == KeyEvent.VK_G) {</span>
+<span class="nc" id="L34">                    timer.stop();</span>
+<span class="nc" id="L35">                    window.saveGame();</span>
+<span class="nc" id="L36">                    timer.start();</span>
+<span class="nc" id="L37">                    return;</span>
+                }
+
+<span class="nc bnc" id="L40" title="All 2 branches missed.">                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {</span>
+<span class="nc" id="L41">                    timer.stop();</span>
+<span class="nc" id="L42">                    int choice = JOptionPane.showOptionDialog(</span>
+                            GamePanel.this,
+                            &quot;Juego pausado. ¿Qué deseas hacer?&quot;,
+                            &quot;Pausa&quot;,
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            new String[]{&quot;Continuar&quot;, &quot;Guardar y salir&quot;, &quot;Salir sin guardar&quot;},
+                            &quot;Continuar&quot;);
+<span class="nc bnc" id="L51" title="All 2 branches missed.">                    if (choice == 1) {</span>
+<span class="nc" id="L52">                        boolean saved = window.saveGame();</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">                        if (saved) window.showMainMenu();</span>
+<span class="nc" id="L54">                        else timer.start();</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                    } else if (choice == 2) {</span>
+<span class="nc" id="L56">                        window.showMainMenu();</span>
+                    } else {
+<span class="nc" id="L58">                        timer.start();</span>
+                    }
+<span class="nc" id="L60">                    return;</span>
+                }
+
+                // Movimiento Player 1 (flechas + diagonal)
+<span class="nc" id="L64">                int dx = 0, dy = 0;</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_UP))    dy -= 1;</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_DOWN))  dy += 1;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_LEFT))  dx -= 1;</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_RIGHT)) dx += 1;</span>
+<span class="nc bnc" id="L69" title="All 4 branches missed.">                if (dx != 0 || dy != 0) {</span>
+<span class="nc" id="L70">                    int steps = game.getPlayer().getSpeed();</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">                    for (int i = 0; i &lt; steps; i++) {</span>
+<span class="nc" id="L72">                        game.movePlayer(dy, dx);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">                        if (checkGameState()) return;</span>
+                    }
+<span class="nc" id="L75">                    repaint();</span>
+                }
+
+                // Movimiento Player 2 (WASD + diagonal)
+<span class="nc" id="L79">                int dx2 = 0, dy2 = 0;</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_W)) dy2 -= 1;</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_S)) dy2 += 1;</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_A)) dx2 -= 1;</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">                if (pressedKeys.contains(KeyEvent.VK_D)) dx2 += 1;</span>
+<span class="nc bnc" id="L84" title="All 4 branches missed.">                if (dx2 != 0 || dy2 != 0) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                    int steps2 = (game.getPlayer2() != null) ? game.getPlayer2().getSpeed() : 1;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">                    for (int i = 0; i &lt; steps2; i++) {</span>
+<span class="nc" id="L87">                        game.movePlayer2(dy2, dx2);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                        if (checkGameState()) return;</span>
+                    }
+<span class="nc" id="L90">                    repaint();</span>
+                }
+<span class="nc" id="L92">            }</span>
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+<span class="nc" id="L96">                pressedKeys.remove(e.getKeyCode());</span>
+<span class="nc" id="L97">            }</span>
+        });
+
+<span class="nc" id="L100">        timer = new Timer(500, this);</span>
+<span class="nc" id="L101">        timer.start();</span>
+<span class="nc" id="L102">    }</span>
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L106">        game.tickTime();</span>
+<span class="nc" id="L107">        game.moveEnemies();</span>
+<span class="nc" id="L108">        repaint();</span>
+<span class="nc" id="L109">        checkGameState();</span>
+<span class="nc" id="L110">    }</span>
+
+    private boolean checkGameState() {
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (game.isVictory()) {</span>
+<span class="nc" id="L114">            timer.stop();</span>
+<span class="nc" id="L115">            JOptionPane.showMessageDialog(this, &quot;¡Victoria! Has completado el nivel &quot; + window.getCurrentLevel() + &quot;.&quot;);</span>
+<span class="nc" id="L116">            window.levelCompleted();</span>
+<span class="nc" id="L117">            return true;</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        } else if (game.isGameOver()) {</span>
+<span class="nc" id="L119">            timer.stop();</span>
+<span class="nc" id="L120">            JOptionPane.showMessageDialog(this, &quot;Game Over. Se acabó el tiempo.&quot;);</span>
+<span class="nc" id="L121">            window.showMainMenu();</span>
+<span class="nc" id="L122">            return true;</span>
+        }
+<span class="nc" id="L124">        return false;</span>
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+<span class="nc" id="L129">        super.paintComponent(g);</span>
+
+<span class="nc" id="L131">        int offsetX = (getWidth() - game.getCols() * CELL_SIZE) / 2;</span>
+<span class="nc" id="L132">        int offsetY = (getHeight() - game.getRows() * CELL_SIZE) / 2;</span>
+
+        // Dibujar tablero
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        for (int r = 0; r &lt; game.getRows(); r++) {</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            for (int c = 0; c &lt; game.getCols(); c++) {</span>
+<span class="nc" id="L137">                CellType type = game.getCell(r, c);</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                if (type == CellType.WALL) {</span>
+<span class="nc" id="L139">                    g.setColor(Color.DARK_GRAY);</span>
+<span class="nc bnc" id="L140" title="All 6 branches missed.">                } else if (type == CellType.SAFE_START || type == CellType.SAFE_END || type == CellType.SAFE_MID) {</span>
+<span class="nc" id="L141">                    g.setColor(new Color(144, 238, 144));</span>
+                } else {
+<span class="nc" id="L143">                    g.setColor(new Color(240, 240, 240));</span>
+                }
+<span class="nc" id="L145">                g.fillRect(offsetX + c * CELL_SIZE, offsetY + r * CELL_SIZE, CELL_SIZE, CELL_SIZE);</span>
+<span class="nc" id="L146">                g.setColor(Color.LIGHT_GRAY);</span>
+<span class="nc" id="L147">                g.drawRect(offsetX + c * CELL_SIZE, offsetY + r * CELL_SIZE, CELL_SIZE, CELL_SIZE);</span>
+            }
+        }
+
+        // Cada moneda sabe cómo dibujarse a sí misma (OCP)
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        for (Coin coin : game.getCoins()) {</span>
+<span class="nc" id="L153">            coin.draw(g, offsetX, offsetY, CELL_SIZE);</span>
+<span class="nc" id="L154">        }</span>
+
+        // Cada elemento especial sabe cómo dibujarse a sí mismo (OCP)
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        for (SpecialElement se : game.getSpecialElements()) {</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">            if (se.isActive()) se.draw(g, offsetX, offsetY, CELL_SIZE);</span>
+<span class="nc" id="L159">        }</span>
+
+        // Cada enemigo sabe cómo dibujarse a sí mismo (OCP)
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        for (Enemy enemy : game.getEnemies()) {</span>
+<span class="nc" id="L163">            enemy.draw(g, offsetX, offsetY, CELL_SIZE);</span>
+<span class="nc" id="L164">        }</span>
+
+        // Dibujar jugadores
+<span class="nc" id="L167">        drawPlayer(g, game.getPlayer(), offsetX, offsetY);</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        if (game.getPlayer2() != null) {</span>
+<span class="nc" id="L169">            drawPlayer(g, game.getPlayer2(), offsetX, offsetY);</span>
+        }
+
+        // HUD
+<span class="nc" id="L173">        g.setColor(Color.BLACK);</span>
+<span class="nc" id="L174">        g.setFont(new Font(&quot;Arial&quot;, Font.BOLD, 16));</span>
+<span class="nc" id="L175">        g.drawString(&quot;Tiempo: &quot; + game.getTimeRemaining(), 20, 30);</span>
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (game.getPlayer2() != null) {</span>
+<span class="nc" id="L178">            g.drawString(&quot;P1 Muertes: &quot; + game.getPlayer().getDeaths(), 150, 30);</span>
+<span class="nc" id="L179">            g.drawString(&quot;P2 Muertes: &quot; + game.getPlayer2().getDeaths(), 150, 50);</span>
+        } else {
+<span class="nc" id="L181">            g.drawString(&quot;Muertes: &quot; + game.getPlayer().getDeaths(), 150, 30);</span>
+        }
+
+<span class="nc" id="L184">        g.drawString(&quot;Monedas: &quot; + game.getCoins().size(), 280, 30);</span>
+<span class="nc" id="L185">        g.setFont(new Font(&quot;Arial&quot;, Font.PLAIN, 11));</span>
+<span class="nc" id="L186">        g.setColor(Color.GRAY);</span>
+<span class="nc" id="L187">        g.drawString(&quot;[G] Guardar   [ESC] Pausa&quot;, 20, getHeight() - 10);</span>
+<span class="nc" id="L188">    }</span>
+
+    private void drawPlayer(Graphics g, Player p, int offsetX, int offsetY) {
+<span class="nc" id="L191">        int size = 30;</span>
+<span class="nc" id="L192">        int padding = 5;</span>
+
+<span class="nc" id="L194">        Skin activeSkin = p.getActiveSkin();</span>
+
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        if (activeSkin == Skin.RED) {</span>
+<span class="nc" id="L197">            g.setColor(Color.RED);</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        } else if (activeSkin == Skin.BLUE) {</span>
+<span class="nc" id="L199">            g.setColor(Color.BLUE);</span>
+<span class="nc" id="L200">            size = 38;</span>
+<span class="nc" id="L201">            padding = 1;</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        } else if (activeSkin == Skin.GREEN) {</span>
+<span class="nc" id="L203">            g.setColor(Color.GREEN);</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">            if (p.isSlowedDown()) g.setColor(new Color(0, 120, 0));</span>
+        } else {
+<span class="nc" id="L206">            g.setColor(Color.BLACK);</span>
+        }
+
+<span class="nc" id="L209">        g.fillRect(</span>
+<span class="nc" id="L210">                offsetX + p.getPosition().getCol() * CELL_SIZE + padding,</span>
+<span class="nc" id="L211">                offsetY + p.getPosition().getRow() * CELL_SIZE + padding,</span>
+                size, size
+        );
+
+<span class="nc bnc" id="L215" title="All 4 branches missed.">        if (activeSkin == Skin.GREEN &amp;&amp; p.isShielded()) {</span>
+<span class="nc" id="L216">            g.setColor(Color.WHITE);</span>
+<span class="nc" id="L217">            g.drawRect(</span>
+<span class="nc" id="L218">                    offsetX + p.getPosition().getCol() * CELL_SIZE + padding,</span>
+<span class="nc" id="L219">                    offsetY + p.getPosition().getRow() * CELL_SIZE + padding,</span>
+                    size, size
+            );
+        }
+<span class="nc" id="L223">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

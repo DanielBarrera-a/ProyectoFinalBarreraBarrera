@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpecialElementFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in ProyectoFinalBarreraBarrera Coverage Results</a> &gt; <a href="index.source.html" class="el_package">domain</a> &gt; <span class="el_source">SpecialElementFactory.java</span></div><h1>SpecialElementFactory.java</h1><pre class="source lang-java linenums">package domain;
+
+/**
+ * Fábrica de elementos especiales.
+ * Para agregar un nuevo elemento especial, solo se añade un caso aquí.
+ * No se modifica ConfigLoader ni TheDOPOHardestGame.
+ */
+<span class="nc" id="L8">public class SpecialElementFactory {</span>
+
+    /**
+     * Crea un elemento especial según el tipo indicado en el archivo de nivel.
+     *
+     * @param type     String del tipo, ej: &quot;BOMB&quot;, &quot;LIFE_SOURCE&quot;
+     * @param position Posición del elemento
+     * @return El elemento construido
+     * @throws GameException Si el tipo no está registrado
+     */
+    public static SpecialElement create(String type, Position position) throws GameException {
+<span class="nc bnc" id="L19" title="All 3 branches missed.">        switch (type) {</span>
+            case &quot;BOMB&quot;:
+<span class="nc" id="L21">                return new Bomb(position);</span>
+            case &quot;LIFE_SOURCE&quot;:
+<span class="nc" id="L23">                return new LifeSource(position);</span>
+            default:
+<span class="nc" id="L25">                throw new GameException(&quot;Tipo de elemento especial desconocido: &quot; + type);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
