@@ -1,6 +1,7 @@
 package presentation;
 
 import domain.Gamesave;
+import domain.MachinePlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,7 @@ public class GameWindow extends JFrame {
     private int currentLevel = 1;
     private domain.GameMode currentMode;
     private domain.Skin currentSkin;
+    private MachinePlayer currentMachine;
 
     private domain.TheDOPOHardestGame currentGame;
 
@@ -30,9 +32,10 @@ public class GameWindow extends JFrame {
         add(mainPanel);
     }
 
-    public void startGame(domain.GameMode mode, domain.Skin skin) {
+    public void startGame(domain.GameMode mode, domain.Skin skin, MachinePlayer machine) {
         this.currentMode = mode;
         this.currentSkin = skin;
+        this.currentMachine = machine;
         this.currentLevel = 1;
         loadLevel();
     }
@@ -41,12 +44,14 @@ public class GameWindow extends JFrame {
         try {
             String levelFile = "level" + currentLevel + ".txt";
             currentGame = domain.ConfigLoader.loadConfig(levelFile, currentMode, currentSkin);
+            if (currentMachine != null) {
+                currentGame.setMachine(currentMachine);
+            }
             GamePanel gamePanel = new GamePanel(this, currentGame);
             mainPanel.add(gamePanel, "Game");
             cardLayout.show(mainPanel, "Game");
             gamePanel.requestFocusInWindow();
         } catch (domain.GameException e) {
-            // Si hay error, asumimos que no hay más niveles (se terminó el juego)
             JOptionPane.showMessageDialog(this, "¡Felicidades! Has completado todos los niveles.", "Juego Terminado", JOptionPane.INFORMATION_MESSAGE);
             showMainMenu();
         }
@@ -64,8 +69,6 @@ public class GameWindow extends JFrame {
     public void showMainMenu() {
         cardLayout.show(mainPanel, "MainMenu");
     }
-
-
 
     public boolean saveGame() {
         try {
