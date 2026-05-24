@@ -216,13 +216,10 @@ Tras cada bloque de tests nuevos ejecutamos `mvn test jacoco:report` y medimos e
 ### Análisis de resultados
 
 #### Comparativa antes / después
+### 4.2 · Coverague 
+![coverage](https://github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera/blob/master/WhatsApp%20Image%202026-05-24%20at%2010.09.56%20AM.jpeg)
 
-| Paquete        | Instrucciones antes | Instrucciones después | Ramas antes | Ramas después |
-|----------------|:-------------------:|:---------------------:|:-----------:|:-------------:|
-| `domain`       | 36 %                | 80 %                 | 28 %        | 75 %         |
-| `presentation` | 0 %                 | 0 %                   | 0 %         | 0 %           |
-| `test`         | 96 %                | 98 %                 | 100 %       | 100 %        |
-| **Total**      | **36 %**            | **~80 %**             | **22 %**    | **~74 %**     |
+ 
 
 #### Por qué priorizamos los métodos `draw()` de enemigos y monedas
 
