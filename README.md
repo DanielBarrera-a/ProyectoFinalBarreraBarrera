@@ -142,10 +142,12 @@ El proyecto muestra un nivel de calidad estática muy alto: solo **4 violaciones
 
 ## 4 · Diagrama de clases y patrones de diseño
 
-<!-- Reemplaza las líneas de abajo con tus imágenes. Ejemplo: ![Diagrama](ruta/imagen.png) -->
+### 4.1 · Diagrama de clases 
 
 ![Diagrama de clases](https://github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera/blob/master/Int%20Skin%20Flow-2026-05-24-163151.png)
 
+
+### 4.2 · Patrones de diseño 
 ![Patrones de diseño](https://github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera/blob/master/Int%20Skin%20Flow-2026-05-24-164033.png)
 
 ---
