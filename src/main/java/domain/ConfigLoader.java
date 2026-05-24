@@ -152,10 +152,10 @@ public class ConfigLoader {
      * Si mañana hay que crear un nuevo enemigo, se escribe en el .txt, solo se agrega el caso en EnemyFactory
      */
     private static void registerEnemy(String[] parts, ParseContext context) throws GameException {
-        String type = parts[1];           // Ej: "BASIC_BLUE" o "BASIC_RED"
+        String type = parts[1];
         int r = Integer.parseInt(parts[2]);
         int c = Integer.parseInt(parts[3]);
-        boolean isHorizontal = parts[4].equals("HORIZONTAL");
-        context.enemies.add(EnemyFactory.create(type, new Position(r, c), isHorizontal));
+        boolean isHorizontal = parts.length > 4 && parts[4].equals("HORIZONTAL");
+        context.enemies.add(EnemyFactory.create(type, new Position(r, c), isHorizontal, parts));
     }
 }
