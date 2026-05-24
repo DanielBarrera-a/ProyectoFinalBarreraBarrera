@@ -71,8 +71,6 @@ mvn test
 mvn test jacoco:report
 ```
 
-El reporte HTML queda en `target/site/jacoco/index.html`. Ábrelo con cualquier navegador.
-
 ### Ejecutar tests + cobertura en un solo paso
 
 ```bash
