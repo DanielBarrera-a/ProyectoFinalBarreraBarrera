@@ -21,6 +21,12 @@ public class CoinFactory {
         switch (type) {
             case "YELLOW":
                 return new YellowCoin(position);
+            case "RED_SKIN":
+                return new SkinCoin(position, Skin.RED);
+            case "BLUE_SKIN":
+                return new SkinCoin(position, Skin.BLUE);
+            case "GREEN_SKIN":
+                return new SkinCoin(position, Skin.GREEN);
             default:
                 throw new GameException("Tipo de moneda desconocido: " + type);
         }
