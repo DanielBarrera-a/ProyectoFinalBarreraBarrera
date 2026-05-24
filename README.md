@@ -118,8 +118,6 @@ Con el plugin `maven-pmd-plugin:3.23.0` ya configurado en el `pom.xml`, basta ej
 mvn pmd:pmd
 ```
 
-El reporte HTML queda en `target/site/pmd.html`. Ábrelo con clic derecho → **Open In → Browser** desde IntelliJ.
-
 ### Resultados obtenidos — PMD 7.0.0
 
 El análisis se ejecutó sobre el paquete `domain` (el paquete `presentation` fue excluido explícitamente). Se encontraron **4 violaciones en 3 archivos**, lo que refleja un código bastante limpio en general.
