@@ -1,4 +1,4 @@
-# 🎮 The DOPO Hardest Game
+#  The DOPO Hardest Game
 
 > **Institución:** Escuela Colombiana de Ingeniería Julio Garavito  
 > **Asignatura:** Proyecto Final  
@@ -7,7 +7,7 @@
 
 ---
 
-## 📋 Tabla de contenidos
+##  Tabla de contenidos
 
 1. [Carta de presentación](#1--carta-de-presentación)
 2. [Guía de comandos](#2--guía-de-comandos)
