@@ -1,4 +1,116 @@
-#informe a entregar ciclo 2#
+# Análisis de Cobertura de Pruebas — The DOPO Hardest Game
+**Escuela Colombiana de Ingeniería Julio Garavito | DOPO 2026-1**  
+**Equipo:** Daniel Barrera & Daniel Barrera
+
+---
+
+## 1. Estado Actual de Cobertura
+
+Resultados obtenidos con JaCoCo:
+
+| Paquete | Instrucciones perdidas | Cobertura | Ramas perdidas | Cobertura ramas | Métodos | Clases |
+|---|---|---|---|---|---|---|
+| `domain` | 196 / 575 | **36%** | 382 / 575 | **28%** | 70 / 124 | 10 / 29 |
+| `presentation` | 79 / 251 | **0%** | 251 / 251 | **0%** | 26 / 26 | 5 / 5 |
+| `test` | 3 / 144 | **96%** | 2 / 38 | **100%** | 3 / 35 | 0 / 1 |
+| **Total** | **3.321 / 5.264** | **36%** | **314 / 404** | **22%** | **99 / 185** | **15 / 35** |
+
+---
+
+## 2. Análisis de Problemas
+
+### 2.1 Dominio — 36% instrucciones, 28% ramas
+
+El dominio tiene 29 clases y solo 10 están completamente cubiertas. Las clases con mayor déficit:
+
+| Clase | Problema | Impacto |
+|---|---|---|
+| `AcceleratedEnemy` | `move()` sin tests: el loop de 2 pasos y el rebote nunca se ejecutan | Alto |
+| `VerticalSliderEnemy` | `move()` sin tests: rebote en pared superior/inferior sin cubrir | Alto |
+| `PatrolEnemy` | Solo 1 test básico: ruta circular con waypoints no cubierta completamente | Alto |
+| `ExpertMachine` | `nextMove()` sin tests: lógica Manhattan y búsqueda de SAFE_END sin cubrir | Alto |
+| `Bomb` | `onPlayerContact()` y `onEnemyContact()` sin tests | Medio |
+| `LifeSource` | `onPlayerContact()` sin tests: `reduceDeath` no verificado en integración | Medio |
+| `SkinCoin` | `onCollected()` sin tests: cambio temporal de skin no verificado | Medio |
+| `ConfigLoader` | Casos de error: archivo inválido y formato incorrecto sin tests | Medio |
+| `TheDOPOHardestGame` | Modo PvM, colisión entre jugadores PvP, `SAFE_MID_2` sin cubrir | Alto |
+| `SaveManager` | `saveGame()` y `loadGame()` sin tests (depende de I/O) | Bajo |
+
+### 2.2 Presentación — 0%
+
+`GamePanel`, `GameWindow`, `MainMenuPanel` y `TheDOPOHardestGameGUI` no tienen ningún test. Esto es **esperado y aceptado**: la capa de presentación Swing depende del EDT (Event Dispatch Thread) y requiere frameworks especializados como AssertJ Swing o TestFX, fuera del alcance del curso.
+
+### 2.3 Ramas no cubiertas — 314 de 404 (78%)
+
+La cobertura de ramas es el indicador más crítico. Las ramas sin cubrir más importantes:
+
+- Rebote en `AcceleratedEnemy`: el enemigo llega a la pared y revierte `direction`
+- Rebote en `VerticalSliderEnemy`: colisión con pared superior/inferior
+- Rama de `player2` en `checkCollisions()`: colisiones del segundo jugador con enemigos y elementos especiales
+- Rama de modo PvM en `tickTime()`: movimiento automático de la máquina
+- Rama de `SAFE_MID_2` en `checkZone()`: zona segura intermedia del segundo jugador
+- Rama de `ExpertMachine` sin monedas: debe ir a `SAFE_END` en lugar de una moneda
+- Rama de `SkinCoin` con skin GREEN: debe activar el escudo del jugador
+
+---
+
+## 3. Plan de Mejora
+
+### 3.1 Tests prioritarios a añadir
+
+#### `AcceleratedEnemy` y `VerticalSliderEnemy`
+- `shouldMoveHorizontallyWhenDirectionIsPositive`
+- `shouldBounceWhenHitsHorizontalWall`
+- `shouldMoveVerticallyWhenDirectionIsPositive`
+- `shouldBounceWhenHitsVerticalWall`
+- `shouldMoveTwoCellsPerTickWhenNoObstacle`
+
+#### `ExpertMachine`
+- `shouldMoveTowardNearestCoinWhenCoinsExist`
+- `shouldMoveTowardSafeEndWhenNoCoinsRemain`
+- `shouldReturnZeroMoveWhenNoTargetExists`
+
+#### `Bomb` y `LifeSource`
+- `shouldKillPlayerWhenPlayerStepsOnBomb`
+- `shouldRemoveEnemyWhenEnemyStepsOnBomb`
+- `shouldDeactivateBombAfterContact`
+- `shouldReduceDeathsWhenPlayerStepsOnLifeSource`
+- `shouldDeactivateLifeSourceAfterContact`
+
+#### `SkinCoin`
+- `shouldApplyBlueSkinWhenPlayerCollectsBlueSkinCoin`
+- `shouldApplyGreenSkinAndActivateShieldWhenPlayerCollectsGreenSkinCoin`
+- `shouldReplacePreviousSkinWhenNewSkinCoinIsCollected`
+
+#### `TheDOPOHardestGame` — modos PvP y PvM
+- `shouldMoveMachineAutomaticallyWhenModeIsPvM`
+- `shouldCauseBothPlayersToRespawnWhenTheyCollide`
+- `shouldUpdatePlayer2RespawnWhenStepsOnSafeMid2`
+- `shouldRegisterVictoryWhenPlayer2ReachesSafeStart`
+
+### 3.2 Objetivo por ciclo
+
+| Ciclo | Cobertura objetivo | Tests a añadir | Clases a cubrir |
+|---|---|---|---|
+| Ciclo 3 (actual) | 36% → 60% | ~15 tests | `AcceleratedEnemy`, `VerticalSliderEnemy`, `Bomb`, `LifeSource`, `SkinCoin` |
+| Ciclo 4 (final) | 60% → 75% | ~12 tests | `ExpertMachine`, `TheDOPOHardestGame` PvP/PvM, `ConfigLoader` errores |
+
+### 3.3 Estrategia general
+
+- Priorizar cobertura de **ramas** sobre instrucciones: cada `if/else` debe tener al menos un test por camino
+- Usar `makeBoard()` y `makeGame()` como helpers para reducir código repetido en los tests
+- No testear la capa de presentación con JUnit: el esfuerzo no justifica el valor para esta entrega
+- Para I/O (`SaveManager`): usar `File.createTempFile()` y borrar en `@AfterEach`
+
+---
+
+## 4. Requisitos No Considerados
+
+| Requisito | Razón de exclusión |
+|---|---|
+| Tests de la capa de presentación | Requiere framework especializado (AssertJ Swing). Fuera del alcance del curso |
+| Cobertura del 100% en dominio | `SaveManager` depende de I/O del sistema de archivos, difícil de mockear sin Mockito |
+| Pruebas de aceptación automatizadas | Se realizaron manualmente ejecutando el juego. No hay framework de UI testing configurado |
 # README — Retrospectiva
 ### ProyectoFinal — The DOPO Hardest Game
 **Escuela Colombiana de Ingeniería | POO 2026-01 | Grupo 03**
