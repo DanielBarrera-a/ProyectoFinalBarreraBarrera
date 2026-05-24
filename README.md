@@ -146,7 +146,7 @@ El proyecto muestra un nivel de calidad estática muy alto: solo **4 violaciones
 
 ![Diagrama de clases](https://github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera/blob/master/Int%20Skin%20Flow-2026-05-24-163151.png)
 
-![Patrones de diseño](patrones-diseno.png)
+![Patrones de diseño](https://github.com/DanielBarrera-a/ProyectoFinalBarreraBarrera/blob/master/Int%20Skin%20Flow-2026-05-24-164033.png)
 
 ---
 
