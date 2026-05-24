@@ -24,6 +24,7 @@ public class ConfigLoader {
         Position startPos = null;
         List<Enemy> enemies = new ArrayList<>();
         List<Coin> coins = new ArrayList<>();
+        List<SpecialElement> specialElements = new ArrayList<>();
     }
 
     /**
@@ -58,6 +59,7 @@ public class ConfigLoader {
         return new TheDOPOHardestGame(
                 context.board, context.startPos,
                 context.enemies, context.coins,
+                context.specialElements,
                 context.time, mode, skin
         );
     }
@@ -89,6 +91,9 @@ public class ConfigLoader {
                 break;
             case "WALL":
                 setCell(parts, context, CellType.WALL);
+                break;
+            case "SPECIAL":
+                registerSpecialElement(parts, context);
                 break;
             case "COIN":
                 registerCoin(parts, context);
@@ -135,15 +140,22 @@ public class ConfigLoader {
         context.coins.add(CoinFactory.create(type, new Position(r, c)));
     }
 
+    private static void registerSpecialElement(String[] parts, ParseContext context) throws GameException {
+        String type = parts[1];           // Ej: "BOMB", "LIFE_SOURCE"
+        int r = Integer.parseInt(parts[2]);
+        int c = Integer.parseInt(parts[3]);
+        context.specialElements.add(SpecialElementFactory.create(type, new Position(r, c)));
+    }
+
     /**
      * Delega la creación del enemigo a EnemyFactory.
      * Si mañana hay que crear un nuevo enemigo, se escribe en el .txt, solo se agrega el caso en EnemyFactory
      */
     private static void registerEnemy(String[] parts, ParseContext context) throws GameException {
-        String type = parts[1];           // Ej: "BASIC_BLUE" o "BASIC_RED"
+        String type = parts[1];
         int r = Integer.parseInt(parts[2]);
         int c = Integer.parseInt(parts[3]);
-        boolean isHorizontal = parts[4].equals("HORIZONTAL");
-        context.enemies.add(EnemyFactory.create(type, new Position(r, c), isHorizontal));
+        boolean isHorizontal = parts.length > 4 && parts[4].equals("HORIZONTAL");
+        context.enemies.add(EnemyFactory.create(type, new Position(r, c), isHorizontal, parts));
     }
 }

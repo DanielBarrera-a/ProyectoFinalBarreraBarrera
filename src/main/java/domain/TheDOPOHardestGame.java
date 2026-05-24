@@ -17,6 +17,7 @@ public class TheDOPOHardestGame implements Serializable {
     private Player player2;
     private List<Enemy> enemies;
     private List<Coin> coins;
+    private List<SpecialElement> specialElements;
     private int timeRemaining;
     private boolean isGameOver;
     private boolean isVictory;
@@ -24,6 +25,11 @@ public class TheDOPOHardestGame implements Serializable {
 
     public TheDOPOHardestGame(CellType[][] board, Position startPos, List<Enemy> enemies, List<Coin> coins,
                               int timeLimit, GameMode mode, Skin skin) {
+        this(board, startPos, enemies, coins, new java.util.ArrayList<>(), timeLimit, mode, skin);
+    }
+
+    public TheDOPOHardestGame(CellType[][] board, Position startPos, List<Enemy> enemies, List<Coin> coins,
+                              List<SpecialElement> specialElements, int timeLimit, GameMode mode, Skin skin) {
         this.board = board;
 
         if (mode == GameMode.PVP) {
@@ -44,6 +50,7 @@ public class TheDOPOHardestGame implements Serializable {
 
         this.enemies = enemies;
         this.coins = coins;
+        this.specialElements = specialElements;
         this.timeRemaining = timeLimit;
         this.isGameOver = false;
         this.isVictory = false;
@@ -117,28 +124,52 @@ public class TheDOPOHardestGame implements Serializable {
         }
         coins.removeAll(collected);
 
+        // Chequear elementos especiales con jugadores
+        for (SpecialElement se : specialElements) {
+            if (!se.isActive()) continue;
+            if (se.getPosition().equals(player.getPosition())) {
+                se.onPlayerContact(player, this);
+            } else if (player2 != null && se.getPosition().equals(player2.getPosition())) {
+                se.onPlayerContact(player2, this);
+            }
+        }
+        specialElements.removeIf(se -> !se.isActive());
+
+        // Chequear elementos especiales con enemigos
+        List<Enemy> enemiesToCheck = new ArrayList<>(enemies);
+        for (Enemy enemy : enemiesToCheck) {
+            for (SpecialElement se : specialElements) {
+                if (!se.isActive()) continue;
+                if (se.getPosition().equals(enemy.getPosition())) {
+                    se.onEnemyContact(enemy, this);
+                }
+            }
+        }
+        specialElements.removeIf(se -> !se.isActive());
+
+        // Colisiones jugadores con enemigos
         for (Enemy enemy : enemies) {
             if (enemy.getPosition().equals(player.getPosition())) {
-                // Cambios para el verde
                 boolean died = player.applyEnemyHit();
                 if (died) {
                     player.getPosition().setRow(player.getRespawnPosition().getRow());
                     player.getPosition().setCol(player.getRespawnPosition().getCol());
-                    // Cambios para el verde
                     player.resetShield();
                 }
             }
             if (player2 != null && enemy.getPosition().equals(player2.getPosition())) {
-                // Cambios para el verde
                 boolean died = player2.applyEnemyHit();
                 if (died) {
                     player2.getPosition().setRow(player2.getRespawnPosition().getRow());
                     player2.getPosition().setCol(player2.getRespawnPosition().getCol());
-                    // Cambios para el verde
                     player2.resetShield();
                 }
             }
         }
+    }
+
+    public void removeEnemy(Enemy enemy) {
+        enemies.remove(enemy);
     }
 
     private void checkZone() {
@@ -200,4 +231,7 @@ public class TheDOPOHardestGame implements Serializable {
 
     public GameMode getMode() {
         return mode; }
+
+    public List<SpecialElement> getSpecialElements() {
+        return specialElements; }
 }

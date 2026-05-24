@@ -15,6 +15,9 @@ public class GamePanel extends JPanel implements ActionListener {
     private Timer timer;
     private final int CELL_SIZE = 40;
 
+    // ── Diagonal: teclas actualmente presionadas ───────────────────────────
+    private final java.util.Set<Integer> pressedKeys = new java.util.HashSet<>();
+
     public GamePanel(GameWindow window, TheDOPOHardestGame game) {
         this.window = window;
         this.game = game;
@@ -24,6 +27,7 @@ public class GamePanel extends JPanel implements ActionListener {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                pressedKeys.add(e.getKeyCode());
                 if (game.isVictory() || game.isGameOver()) return;
 
                 if (e.getKeyCode() == KeyEvent.VK_G) {
@@ -56,16 +60,13 @@ public class GamePanel extends JPanel implements ActionListener {
                     return;
                 }
 
-                // Movimiento Player 1 (flechas)
+                // Movimiento Player 1 (flechas + diagonal)
                 int dx = 0, dy = 0;
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:    dy = -1; break;
-                    case KeyEvent.VK_DOWN:  dy =  1; break;
-                    case KeyEvent.VK_LEFT:  dx = -1; break;
-                    case KeyEvent.VK_RIGHT: dx =  1; break;
-                }
+                if (pressedKeys.contains(KeyEvent.VK_UP))    dy -= 1;
+                if (pressedKeys.contains(KeyEvent.VK_DOWN))  dy += 1;
+                if (pressedKeys.contains(KeyEvent.VK_LEFT))  dx -= 1;
+                if (pressedKeys.contains(KeyEvent.VK_RIGHT)) dx += 1;
                 if (dx != 0 || dy != 0) {
-                    // Cambios para el verde
                     int steps = game.getPlayer().getSpeed();
                     for (int i = 0; i < steps; i++) {
                         game.movePlayer(dy, dx);
@@ -74,16 +75,13 @@ public class GamePanel extends JPanel implements ActionListener {
                     repaint();
                 }
 
-                // Movimiento Player 2 (WASD)
+                // Movimiento Player 2 (WASD + diagonal)
                 int dx2 = 0, dy2 = 0;
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_W: dy2 = -1; break;
-                    case KeyEvent.VK_S: dy2 =  1; break;
-                    case KeyEvent.VK_A: dx2 = -1; break;
-                    case KeyEvent.VK_D: dx2 =  1; break;
-                }
+                if (pressedKeys.contains(KeyEvent.VK_W)) dy2 -= 1;
+                if (pressedKeys.contains(KeyEvent.VK_S)) dy2 += 1;
+                if (pressedKeys.contains(KeyEvent.VK_A)) dx2 -= 1;
+                if (pressedKeys.contains(KeyEvent.VK_D)) dx2 += 1;
                 if (dx2 != 0 || dy2 != 0) {
-                    // Cambios para el verde
                     int steps2 = (game.getPlayer2() != null) ? game.getPlayer2().getSpeed() : 1;
                     for (int i = 0; i < steps2; i++) {
                         game.movePlayer2(dy2, dx2);
@@ -91,6 +89,11 @@ public class GamePanel extends JPanel implements ActionListener {
                     }
                     repaint();
                 }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                pressedKeys.remove(e.getKeyCode());
             }
         });
 
@@ -150,6 +153,11 @@ public class GamePanel extends JPanel implements ActionListener {
             coin.draw(g, offsetX, offsetY, CELL_SIZE);
         }
 
+        // Cada elemento especial sabe cómo dibujarse a sí mismo (OCP)
+        for (SpecialElement se : game.getSpecialElements()) {
+            if (se.isActive()) se.draw(g, offsetX, offsetY, CELL_SIZE);
+        }
+
         // Cada enemigo sabe cómo dibujarse a sí mismo (OCP)
         for (Enemy enemy : game.getEnemies()) {
             enemy.draw(g, offsetX, offsetY, CELL_SIZE);
@@ -183,15 +191,16 @@ public class GamePanel extends JPanel implements ActionListener {
         int size = 30;
         int padding = 5;
 
-        if (p.getSkin() == Skin.RED) {
+        Skin activeSkin = p.getActiveSkin();
+
+        if (activeSkin == Skin.RED) {
             g.setColor(Color.RED);
-        } else if (p.getSkin() == Skin.BLUE) {
+        } else if (activeSkin == Skin.BLUE) {
             g.setColor(Color.BLUE);
             size = 38;
             padding = 1;
-        } else if (p.getSkin() == Skin.GREEN) {
+        } else if (activeSkin == Skin.GREEN) {
             g.setColor(Color.GREEN);
-            // Cambios para el verde
             if (p.isSlowedDown()) g.setColor(new Color(0, 120, 0));
         } else {
             g.setColor(Color.BLACK);
@@ -203,8 +212,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 size, size
         );
 
-        // Cambios para el verde
-        if (p.getSkin() == Skin.GREEN && p.isShielded()) {
+        if (activeSkin == Skin.GREEN && p.isShielded()) {
             g.setColor(Color.WHITE);
             g.drawRect(
                     offsetX + p.getPosition().getCol() * CELL_SIZE + padding,
