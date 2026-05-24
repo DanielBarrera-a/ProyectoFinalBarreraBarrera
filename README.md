@@ -1,4 +1,4 @@
-# 🎮 The DOPO Hardest Game
+# The DOPO Hardest Game
 
 > **Institución:** Escuela Colombiana de Ingeniería Julio Garavito  
 > **Asignatura:** Proyecto Final  
@@ -7,7 +7,7 @@
 
 ---
 
-## 📋 Tabla de contenidos
+## Tabla de contenidos
 
 1. [Carta de presentación](#1--carta-de-presentación)
 2. [Guía de comandos](#2--guía-de-comandos)
@@ -290,7 +290,7 @@ Cuando un test falla, el nombre del método indica exactamente qué contrato rom
 
 ### Retrospectiva del equipo
 
-| ✅ Lo que funcionó bien                                        | 🔧 Lo que mejoraríamos                                            |
+|  Lo que funcionó bien                                        |  Lo que mejoraríamos                                            |
 |---------------------------------------------------------------|------------------------------------------------------------------|
 | Arquitectura con fábricas y abstracciones facilitó el testing | Añadir PMD desde el inicio del proyecto, no al final             |
 | Separación estricta `domain` / `presentation`                 | Introducir Mockito para aislar `SaveManager` desde la entrega 1  |
